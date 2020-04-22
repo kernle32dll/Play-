@@ -19,9 +19,11 @@ namespace Iop
 	private:
 		uint32 LoadStartModule(uint32, uint32, uint32, uint32);
 		uint32 StartModule(uint32, uint32, uint32, uint32, uint32);
+		uint32 UnloadModule(uint32);
 		uint32 LoadModuleBufferAddress(uint32, uint32, uint32);
 		uint32 LoadModuleBuffer(uint32);
 		uint32 GetModuleIdList(uint32, uint32, uint32);
+		uint32 StopModule(uint32, uint32, uint32, uint32);
 		int32 ReferModuleStatus(uint32, uint32);
 		int32 SearchModuleByName(uint32);
 		int32 AllocLoadMemory(uint32, uint32, uint32);
