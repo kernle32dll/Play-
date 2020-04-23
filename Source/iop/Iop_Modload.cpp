@@ -229,7 +229,11 @@ int32 CModload::SearchModuleByName(uint32 moduleNamePtr)
 {
 	CLog::GetInstance().Print(LOG_NAME, FUNCTION_SEARCHMODULEBYNAME "(moduleNamePtr = %s);\r\n",
 	                          PrintStringParameter(m_ram, moduleNamePtr).c_str());
-	return KERNEL_RESULT_ERROR_UNKNOWN_MODULE;
+
+	const char* moduleName = reinterpret_cast<const char*>(m_ram + moduleNamePtr);
+
+	auto result = m_bios.SearchModuleByName(moduleName);
+	return result;
 }
 
 int32 CModload::AllocLoadMemory(uint32 unknown1, uint32 size, uint32 unknown2)
