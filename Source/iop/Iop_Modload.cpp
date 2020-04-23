@@ -15,6 +15,7 @@ using namespace Iop;
 #define FUNCTION_LOADMODULEBUFFER "LoadModuleBuffer"
 #define FUNCTION_GETMODULEIDLIST "GetModuleIdList"
 #define FUNCTION_REFERMODULESTATUS "ReferModuleStatus"
+#define FUNCTION_GETMODULEIDLISTBYNAME "GetModuleIdListByName"
 #define FUNCTION_STOPMODULE "StopModule"
 #define FUNCTION_UNLOADMODULE "UnloadModule"
 #define FUNCTION_SEARCHMODULEBYNAME "SearchModuleByName"
@@ -52,6 +53,9 @@ std::string CModload::GetFunctionName(unsigned int functionId) const
 		break;
 	case 17:
 		return FUNCTION_REFERMODULESTATUS;
+		break;
+	case 18:
+		return FUNCTION_GETMODULEIDLISTBYNAME;
 		break;
 	case 20:
 		return FUNCTION_STOPMODULE;
@@ -121,6 +125,13 @@ void CModload::Invoke(CMIPS& context, unsigned int functionId)
 	case 21:
 		context.m_State.nGPR[CMIPS::V0].nD0 = UnloadModule(
 		    context.m_State.nGPR[CMIPS::A0].nV0);
+		break;
+	case 18:
+		context.m_State.nGPR[CMIPS::V0].nD0 = GetModuleIdListByName(
+		    context.m_State.nGPR[CMIPS::A0].nV0,
+		    context.m_State.nGPR[CMIPS::A1].nV0,
+		    context.m_State.nGPR[CMIPS::A2].nV0,
+		    context.m_State.nGPR[CMIPS::A3].nV0);
 		break;
 	case 22:
 		context.m_State.nGPR[CMIPS::V0].nD0 = SearchModuleByName(
@@ -223,6 +234,39 @@ int32 CModload::ReferModuleStatus(uint32 moduleId, uint32 moduleStatusPtr)
 	CLog::GetInstance().Print(LOG_NAME, FUNCTION_REFERMODULESTATUS "(moduleId = %d, moduleStatusPtr = 0x%08X);\r\n",
 	                          moduleId, moduleStatusPtr);
 	return KERNEL_RESULT_ERROR_UNKNOWN_MODULE;
+}
+
+int32 CModload::GetModuleIdListByName(uint32 moduleNamePtr, uint32 readBufPtr, uint32 readBufSize, uint32 moduleCountPtr)
+{
+	CLog::GetInstance().Print(LOG_NAME, FUNCTION_GETMODULEIDLISTBYNAME "(moduleNamePtr = 0x%08X, readBufPtr = 0x%08X, readBufSize = 0x%08X, moduleCountPtr = 0x%08X);\r\n",
+	                          moduleNamePtr, readBufPtr, readBufSize, moduleCountPtr);
+	auto moduleCount = (moduleCountPtr != 0) ? reinterpret_cast<uint32*>(m_ram + moduleCountPtr) : nullptr;
+	auto readBuf = (readBufPtr != 0) ? reinterpret_cast<uint32*>(m_ram + readBufPtr) : nullptr;
+
+	if(readBufSize != 1)
+	{
+		// I can find no documentation whatsoever on this
+		// Does it even make sense? I suppose it depends on what
+		// moduleName can be - wildcards?
+		(*moduleCount) = 0;
+	}
+	else
+	{
+		const char* moduleName = reinterpret_cast<const char*>(m_ram + moduleNamePtr);
+		int32 moduleId = m_bios.SearchModuleByName(moduleName);
+
+		if(readBuf)
+		{
+			(*readBuf) = moduleId;
+		}
+
+		if(moduleCount)
+		{
+			(*moduleCount) = 1;
+		}
+	}
+
+	return 0;
 }
 
 int32 CModload::SearchModuleByName(uint32 moduleNamePtr)
