@@ -9,16 +9,66 @@
 class CGIF
 {
 public:
+	// Control register
+	// 0x10003000 - 0x1000300F
+	struct CTRL : public convertible<uint32>
+	{
+		unsigned int reset : 1;
+		unsigned int unused0 : 2;
+		unsigned int tempStop : 1;
+		unsigned int unused1 : 28;
+	};
+	static_assert(sizeof(CTRL) == 4, "Size of CTRL must be 4 bytes.");
+
+	// Mode of operation
+	// 0x10003010 - 0x1000301F
+	struct MODE : public convertible<uint32>
+	{
+		unsigned int maskP3 : 1;
+		unsigned int unused : 1;
+		unsigned int intMode : 1;
+		unsigned int unknown : 29; // padding? Unknown....
+	};
+	static_assert(sizeof(MODE) == 4, "Size of MODE must be 4 bytes.");
+
+	// Status register
+	// 0x10003020 - 0x1000302F
+	struct STATUS : public convertible<uint32>
+	{
+		unsigned int p3MaskedByMode : 1;
+		unsigned int p3MaskedByVIF : 1;
+		unsigned int intMode : 1;
+		unsigned int tempStop : 1;
+		unsigned int unused0 : 1;
+		unsigned int path3Something : 1;
+		unsigned int path3queued : 1;
+		unsigned int path2queued : 1;
+		unsigned int path1queued : 1;
+		unsigned int outputPath : 1;
+		unsigned int activePath : 2;
+		unsigned int transferDir : 1;
+		unsigned int unused1 : 11;
+		unsigned int fifoData : 5;
+		unsigned int unused2 : 3;
+	};
+	static_assert(sizeof(STATUS) == 4, "Size of STATUS must be 4 bytes.");
+
 	enum REGISTER
 	{
-		GIF_STAT = 0x10003020
+		GIF_CTRL = 0x10003000,
+		GIF_MODE = 0x10003010,
+		GIF_STAT = 0x10003020,
+		//        GIF_TAG0 = 0x10003040,
+		//        GIF_TAG1 = 0x10003050,
+		//        GIF_TAG2 = 0x10003060,
+		//        GIF_TAG3 = 0x10003070,
 	};
 
-	enum
-	{
-		GIF_STAT_M3P = 0x002,
-		GIF_STAT_APATH3 = 0xC00,
-	};
+//	enum
+//	{
+//		GIF_STAT_M3P = 0x002,
+//		GIF_STAT_APATH3 = 0xC00,
+//	};
 
 	enum
 	{
@@ -74,9 +124,6 @@ private:
 	void DisassembleGet(uint32);
 	void DisassembleSet(uint32, uint32);
 
-	bool m_path3Masked = false;
-	uint32 m_activePath = 0;
-
 	uint16 m_loops = 0;
 	uint8 m_cmd = 0;
 	uint8 m_regs = 0;
@@ -88,6 +135,7 @@ private:
 	uint8* m_ram;
 	uint8* m_spr;
 	CGSHandler*& m_gs;
+    STATUS m_Stat;
 
 	CProfiler::ZoneHandle m_gifProfilerZone = 0;
 };
