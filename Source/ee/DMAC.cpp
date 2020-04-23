@@ -429,6 +429,7 @@ uint32 CDMAC::GetRegister(uint32 nAddress)
 		REGISTER_READ(D8_CHCR, m_D8.ReadCHCR())
 		REGISTER_READ(D8_MADR, m_D8.m_nMADR)
 		REGISTER_READ(D8_QWC, m_D8.m_nQWC)
+		REGISTER_READ(D8_TADR, m_D8.m_nTADR)
 		REGISTER_READ(D8_SADR, m_D8_SADR)
 
 	case D8_CHCR + 0x1:
@@ -475,6 +476,26 @@ uint32 CDMAC::GetRegister(uint32 nAddress)
 	case D_ENABLER + 0x8:
 	case D_ENABLER + 0xC:
 		break;
+
+	// Invalid addresses, actually called by games.
+	// I presume, they are written as part of a dumb
+	// loop based address reset-logic.
+	case 0x10008080:
+	case 0x10009080:
+	case 0x1000A080:
+	case 0x1000B080:
+	case 0x1000B480:
+		break; // Only SPR_FROM and SPR_TO have an SADR
+	case 0x1000B040:
+	case 0x1000B440:
+	case 0x1000D040:
+	case 0x1000D440:
+		break; // Only VIF0, VIF1 and GIF have an ASR0
+	case 0x1000B050:
+	case 0x1000B450:
+	case 0x1000D050:
+	case 0x1000D450:
+		break; // Only VIF0, VIF1 and GIF have an ASR1
 
 	default:
 		CLog::GetInstance().Warn(LOG_NAME, "Read an unhandled IO port (0x%08X).\r\n", nAddress);
@@ -799,6 +820,14 @@ void CDMAC::SetRegister(uint32 nAddress, uint32 nData)
 	case D8_QWC + 0xC:
 		break;
 
+	case D8_TADR + 0x0:
+		m_D8.m_nTADR = nData;
+		break;
+	case D8_TADR + 0x4:
+	case D8_TADR + 0x8:
+	case D8_TADR + 0xC:
+		break;
+
 	case D8_SADR + 0x0:
 		m_D8_SADR = nData & SADR_WRITE_MASK;
 		break;
@@ -926,6 +955,26 @@ void CDMAC::SetRegister(uint32 nAddress, uint32 nData)
 	case D_ENABLEW + 0xC:
 		break;
 
+	// Invalid addresses, actually called by games.
+	// I presume, they are written as part of a dumb
+	// loop based address reset-logic.
+	case 0x10008080:
+	case 0x10009080:
+	case 0x1000A080:
+	case 0x1000B080:
+	case 0x1000B480:
+		break; // Only SPR_FROM and SPR_TO have an SADR
+	case 0x1000B040:
+	case 0x1000B440:
+	case 0x1000D040:
+	case 0x1000D440:
+		break; // Only VIF0, VIF1 and GIF have an ASR0
+	case 0x1000B050:
+	case 0x1000B450:
+	case 0x1000D050:
+	case 0x1000D450:
+		break; // Only VIF0, VIF1 and GIF have an ASR1
+
 	default:
 		CLog::GetInstance().Warn(LOG_NAME, "Wrote to an unhandled IO port (0x%08X, 0x%08X).\r\n", nAddress, nData);
 		break;
@@ -1045,6 +1094,7 @@ void CDMAC::DisassembleGet(uint32 nAddress)
 		LOG_GET(D8_CHCR)
 		LOG_GET(D8_MADR)
 		LOG_GET(D8_QWC)
+		LOG_GET(D8_TADR)
 		LOG_GET(D8_SADR)
 
 		//Channel 9
@@ -1061,6 +1111,26 @@ void CDMAC::DisassembleGet(uint32 nAddress)
 		LOG_GET(D_RBSR)
 		LOG_GET(D_RBOR)
 		LOG_GET(D_ENABLER)
+
+	// Invalid addresses, actually called by games.
+	// I presume, they are written as part of a dumb
+	// loop based address reset-logic.
+	case 0x10008080:
+	case 0x10009080:
+	case 0x1000A080:
+	case 0x1000B080:
+	case 0x1000B480:
+		break; // Only SPR_FROM and SPR_TO have an SADR
+	case 0x1000B040:
+	case 0x1000B440:
+	case 0x1000D040:
+	case 0x1000D440:
+		break; // Only VIF0, VIF1 and GIF have an ASR0
+	case 0x1000B050:
+	case 0x1000B450:
+	case 0x1000D050:
+	case 0x1000D450:
+		break; // Only VIF0, VIF1 and GIF have an ASR1
 
 	default:
 		CLog::GetInstance().Warn(LOG_NAME, "Reading unknown register 0x%08X.\r\n", nAddress);
@@ -1129,6 +1199,7 @@ void CDMAC::DisassembleSet(uint32 nAddress, uint32 nData)
 		LOG_SET(D8_CHCR)
 		LOG_SET(D8_MADR)
 		LOG_SET(D8_QWC)
+		LOG_SET(D8_TADR)
 		LOG_SET(D8_SADR)
 
 		//Channel 9
@@ -1147,6 +1218,26 @@ void CDMAC::DisassembleSet(uint32 nAddress, uint32 nData)
 		LOG_SET(D_RBOR)
 		LOG_SET(D_STADR)
 		LOG_SET(D_ENABLEW)
+
+	// Invalid addresses, actually called by games.
+	// I presume, they are written as part of a dumb
+	// loop based address reset-logic.
+	case 0x10008080:
+	case 0x10009080:
+	case 0x1000A080:
+	case 0x1000B080:
+	case 0x1000B480:
+		break; // Only SPR_FROM and SPR_TO have an SADR
+	case 0x1000B040:
+	case 0x1000B440:
+	case 0x1000D040:
+	case 0x1000D440:
+		break; // Only VIF0, VIF1 and GIF have an ASR0
+	case 0x1000B050:
+	case 0x1000B450:
+	case 0x1000D050:
+	case 0x1000D450:
+		break; // Only VIF0, VIF1 and GIF have an ASR1
 
 	default:
 		CLog::GetInstance().Warn(LOG_NAME, "Writing unknown register 0x%08X, 0x%08X.\r\n", nAddress, nData);
