@@ -65,10 +65,12 @@ CDMAC::CDMAC(uint8* ram, uint8* spr, uint8* vuMem0, CMIPS& ee)
     , m_D3_CHCR(0)
     , m_D3_MADR(0)
     , m_D3_QWC(0)
+    , m_D3_TADR(0)
     , m_D4(*this, 4, DummyTransferFunction)
     , m_D5_CHCR(0)
     , m_D5_MADR(0)
     , m_D5_QWC(0)
+    , m_D5_TADR(0)
     , m_D6_CHCR(0)
     , m_D6_MADR(0)
     , m_D6_QWC(0)
@@ -105,6 +107,7 @@ void CDMAC::Reset()
 	m_D3_CHCR = 0;
 	m_D3_MADR = 0;
 	m_D3_QWC = 0;
+	m_D3_TADR = 0;
 
 	//Reset Channel 4
 	m_D4.Reset();
@@ -113,6 +116,7 @@ void CDMAC::Reset()
 	m_D5_CHCR = 0;
 	m_D5_MADR = 0;
 	m_D5_QWC = 0;
+	m_D5_TADR = 0;
 
 	//Reset Channel 6
 	m_D6_CHCR = 0;
@@ -380,6 +384,15 @@ uint32 CDMAC::GetRegister(uint32 nAddress)
 		return 0;
 		break;
 
+	case D3_TADR + 0x0:
+		return m_D3_TADR;
+		break;
+	case D3_TADR + 0x4:
+	case D3_TADR + 0x8:
+	case D3_TADR + 0xC:
+		return 0;
+		break;
+
 	case D4_CHCR + 0x0:
 		return m_D4.ReadCHCR();
 		break;
@@ -422,6 +435,15 @@ uint32 CDMAC::GetRegister(uint32 nAddress)
 	case D5_CHCR + 0x4:
 	case D5_CHCR + 0x8:
 	case D5_CHCR + 0xC:
+		return 0;
+		break;
+
+	case D5_TADR + 0x0:
+		return m_D5_TADR;
+		break;
+	case D5_TADR + 0x4:
+	case D5_TADR + 0x8:
+	case D5_TADR + 0xC:
 		return 0;
 		break;
 
@@ -680,6 +702,14 @@ void CDMAC::SetRegister(uint32 nAddress, uint32 nData)
 	case D3_QWC + 0x0C:
 		break;
 
+	case D3_TADR + 0x0:
+		m_D3_TADR = nData;
+		break;
+	case D3_TADR + 0x4:
+	case D3_TADR + 0x8:
+	case D3_TADR + 0xC:
+		break;
+
 	//D4_CHCR
 	case D4_CHCR + 0x0:
 		m_D4.WriteCHCR(nData);
@@ -739,6 +769,14 @@ void CDMAC::SetRegister(uint32 nAddress, uint32 nData)
 	case D5_MADR + 0x4:
 	case D5_MADR + 0x8:
 	case D5_MADR + 0xC:
+		break;
+
+	case D5_TADR + 0x0:
+		m_D5_TADR = nData;
+		break;
+	case D5_TADR + 0x4:
+	case D5_TADR + 0x8:
+	case D5_TADR + 0xC:
 		break;
 
 	//D5_QWC
@@ -1177,6 +1215,7 @@ void CDMAC::DisassembleSet(uint32 nAddress, uint32 nData)
 		LOG_SET(D3_CHCR)
 		LOG_SET(D3_MADR)
 		LOG_SET(D3_QWC)
+		LOG_SET(D3_TADR)
 
 		//Channel 4
 		LOG_SET(D4_CHCR)
@@ -1188,6 +1227,7 @@ void CDMAC::DisassembleSet(uint32 nAddress, uint32 nData)
 		LOG_SET(D5_CHCR)
 		LOG_SET(D5_MADR)
 		LOG_SET(D5_QWC)
+		LOG_SET(D5_TADR)
 
 		//Channel 6
 		LOG_SET(D6_CHCR)

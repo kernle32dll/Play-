@@ -52,6 +52,7 @@ public:
 		D3_CHCR = 0x1000B000,
 		D3_MADR = 0x1000B010,
 		D3_QWC = 0x1000B020,
+		D3_TADR = 0x1000B030,
 
 		D4_CHCR = 0x1000B400,
 		D4_MADR = 0x1000B410,
@@ -61,6 +62,7 @@ public:
 		D5_CHCR = 0x1000C000,
 		D5_MADR = 0x1000C010,
 		D5_QWC = 0x1000C020,
+		D5_TADR = 0x1000C030,
 
 		D6_CHCR = 0x1000C400,
 		D6_MADR = 0x1000C410,
@@ -173,12 +175,14 @@ private:
 	uint32 m_D3_CHCR;
 	uint32 m_D3_MADR;
 	uint32 m_D3_QWC;
+	uint32 m_D3_TADR;
 
 	Dmac::CChannel m_D4;
 
 	uint32 m_D5_CHCR;
 	uint32 m_D5_MADR;
 	uint32 m_D5_QWC;
+	uint32 m_D5_TADR;
 
 	uint32 m_D6_CHCR;
 	uint32 m_D6_MADR;
