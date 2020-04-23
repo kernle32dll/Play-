@@ -196,6 +196,8 @@ namespace Iop
 		static const char* m_mcPathPreference[2];
 		std::string m_currentDirectory;
 		CPathFinder m_pathFinder;
+
+		uint32 m_lastPort;
 	};
 
 	typedef std::shared_ptr<CMcServ> McServPtr;

@@ -265,12 +265,15 @@ void CMcServ::GetInfo(uint32* args, uint32 argsSize, uint32* ret, uint32 retSize
 		retBuffer[0x24] = 1;
 	}
 
+	bool sameCardAsPrev = m_lastPort == port;
+	m_lastPort = port;
+
 	//Return values
 	//  0 if same card as previous call
 	//  -1 if new formatted card
 	//  -2 if new unformatted card
 	//> -2 on error
-	ret[0] = 0;
+	ret[0] = sameCardAsPrev ? 0 : -1;
 
 	//Many games seem to be sensitive to the delay response of this function:
 	//- Nights Into Dreams (issues 2 Syncs very close to each other, infinite loop if GetInfo is instantenous)
