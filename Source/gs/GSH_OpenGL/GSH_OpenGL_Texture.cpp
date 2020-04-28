@@ -30,6 +30,7 @@ void CGSH_OpenGL::SetupTextureUpdaters()
 	m_textureUpdater[PSMT8H] = &CGSH_OpenGL::TexUpdater_Psm48H<24, 0xFF>;
 	m_textureUpdater[PSMT4HL] = &CGSH_OpenGL::TexUpdater_Psm48H<24, 0x0F>;
 	m_textureUpdater[PSMT4HH] = &CGSH_OpenGL::TexUpdater_Psm48H<28, 0x0F>;
+	m_textureUpdater[PSMZ16] = &CGSH_OpenGL::TexUpdater_PsmZ16<CGsPixelFormats::CPixelIndexorPSMZ16>;
 }
 
 uint32 CGSH_OpenGL::GetFramebufferBitDepth(uint32 psm)
@@ -61,6 +62,8 @@ CGSH_OpenGL::TEXTUREFORMAT_INFO CGSH_OpenGL::GetTextureFormatInfo(uint32 psm)
 	case PSMCT16:
 	case PSMCT16S:
 		return TEXTUREFORMAT_INFO{GL_RGB5_A1, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1};
+	case PSMZ16:
+		return TEXTUREFORMAT_INFO{GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_R16UI};
 	case PSMT8:
 	case PSMT4:
 	case PSMT8H:
@@ -318,6 +321,28 @@ void CGSH_OpenGL::TexUpdater_Psm16(uint32 bufPtr, uint32 bufWidth, unsigned int 
 
 	glTexSubImage2D(GL_TEXTURE_2D, 0, texX, texY, texWidth, texHeight, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, m_pCvtBuffer);
 	CHECKGLERROR();
+}
+
+template <typename IndexorType>
+void CGSH_OpenGL::TexUpdater_PsmZ16(uint32 bufPtr, uint32 bufWidth, unsigned int texX, unsigned int texY, unsigned int texWidth, unsigned int texHeight)
+{
+	IndexorType indexor(m_pRAM, bufPtr, bufWidth);
+
+	auto dst = reinterpret_cast<uint16*>(m_pCvtBuffer);
+	for(unsigned int y = 0; y < texHeight; y++)
+	{
+		for(unsigned int x = 0; x < texWidth; x++)
+		{
+			uint16 cvtPixel = 0xFFFF;
+
+			dst[x] = cvtPixel;
+		}
+
+		dst += texWidth;
+	}
+
+	glTexSubImage2D(GL_TEXTURE_2D, 0, texX, texY, texWidth, texHeight, GL_DEPTH_COMPONENT, GL_R16UI, m_pCvtBuffer);
+    CHECKGLERROR();
 }
 
 template <typename IndexorType>

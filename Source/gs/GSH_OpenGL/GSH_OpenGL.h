@@ -359,6 +359,9 @@ private:
 	void TexUpdater_Psm16(uint32, uint32, unsigned int, unsigned int, unsigned int, unsigned int);
 
 	template <typename>
+	void TexUpdater_PsmZ16(uint32, uint32, unsigned int, unsigned int, unsigned int, unsigned int);
+
+	template <typename>
 	void TexUpdater_Psm48(uint32, uint32, unsigned int, unsigned int, unsigned int, unsigned int);
 	template <uint32, uint32>
 	void TexUpdater_Psm48H(uint32, uint32, unsigned int, unsigned int, unsigned int, unsigned int);

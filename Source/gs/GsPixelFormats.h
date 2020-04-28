@@ -363,6 +363,7 @@ public:
 	typedef CPixelIndexor<STORAGEPSMCT16S> CPixelIndexorPSMCT16S;
 	typedef CPixelIndexor<STORAGEPSMT8> CPixelIndexorPSMT8;
 	typedef CPixelIndexor<STORAGEPSMT4> CPixelIndexorPSMT4;
+	typedef CPixelIndexor<STORAGEPSMZ16> CPixelIndexorPSMZ16;
 };
 
 //////////////////////////////////////////////
