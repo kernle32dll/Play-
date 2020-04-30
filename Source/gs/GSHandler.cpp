@@ -1757,6 +1757,17 @@ std::string CGSHandler::DisassembleWrite(uint8 registerId, uint64 data)
 		                       (registerId == GS_REG_SCISSOR_1) ? 1 : 2, scissor.scax0, scissor.scax1, scissor.scay0, scissor.scay1);
 	}
 	break;
+	case GS_REG_DTHE:
+		result = string_format("DTHE(DTHE: %d)", data & 1);
+		break;
+	case GS_REG_DIMX:
+	{
+		auto dimx = make_convertible<DIMX>(data);
+		result = string_format("DIMX(DM0x %i,%i,%i,%i, DM1x: %i,%i,%i,%i, DM2x: %i%i,%i,%i, DM3x: %i,%i,%i,%i)",
+		                       dimx.dm00, dimx.dm01, dimx.dm02, dimx.dm03, dimx.dm10, dimx.dm11, dimx.dm12, dimx.dm13,
+		                       dimx.dm20, dimx.dm21, dimx.dm22, dimx.dm23, dimx.dm30, dimx.dm31, dimx.dm32, dimx.dm33);
+	}
+	break;
 	case GS_REG_COLCLAMP:
 		result = string_format("COLCLAMP(CLAMP: %d)", data & 1);
 		break;

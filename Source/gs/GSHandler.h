@@ -57,6 +57,8 @@ enum GS_REGS
 	GS_REG_SCISSOR_2 = 0x41,
 	GS_REG_ALPHA_1 = 0x42,
 	GS_REG_ALPHA_2 = 0x43,
+	GS_REG_DIMX = 0x44,
+	GS_REG_DTHE = 0x45,
 	GS_REG_COLCLAMP = 0x46,
 	GS_REG_TEST_1 = 0x47,
 	GS_REG_TEST_2 = 0x48,
@@ -625,6 +627,44 @@ public:
 		unsigned int nReserved1 : 24;
 	};
 	static_assert(sizeof(ALPHA) == sizeof(uint64), "Size of ALPHA struct must be 8 bytes.");
+
+	//Reg 0x44
+	struct DIMX : public convertible<uint64>
+	{
+		unsigned int dm00 : 2;
+		unsigned int unused0 : 2;
+		unsigned int dm01 : 2;
+		unsigned int unused1 : 2;
+		unsigned int dm02 : 2;
+		unsigned int unused2 : 2;
+		unsigned int dm03 : 2;
+		unsigned int unused3 : 2;
+		unsigned int dm10 : 2;
+		unsigned int unused4 : 2;
+		unsigned int dm11 : 2;
+		unsigned int unused5 : 2;
+		unsigned int dm12 : 2;
+		unsigned int unused6 : 2;
+		unsigned int dm13 : 2;
+		unsigned int unused7 : 2;
+		unsigned int dm20 : 2;
+		unsigned int unused8 : 2;
+		unsigned int dm21 : 2;
+		unsigned int unused9 : 2;
+		unsigned int dm22 : 2;
+		unsigned int unused10 : 2;
+		unsigned int dm23 : 2;
+		unsigned int unused11 : 2;
+		unsigned int dm30 : 2;
+		unsigned int unused12 : 2;
+		unsigned int dm31 : 2;
+		unsigned int unused13 : 2;
+		unsigned int dm32 : 2;
+		unsigned int unused14 : 2;
+		unsigned int dm33 : 2;
+		unsigned int unused15 : 2;
+	};
+	static_assert(sizeof(DIMX) == sizeof(uint64), "Size of DIMX struct must be 8 bytes.");
 
 	//Reg 0x47/0x48
 	struct TEST : public convertible<uint64>
