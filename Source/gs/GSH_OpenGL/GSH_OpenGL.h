@@ -92,7 +92,8 @@ private:
 		unsigned int hasAlphaTest : 1;
 		unsigned int alphaTestMethod : 3;
 		unsigned int colorOutputWhite : 1;
-		unsigned int padding : 12;
+		unsigned int alphaFailMethod : 2;
+		unsigned int padding : 10;
 
 		bool isIndexedTextureSource() const
 		{
@@ -320,7 +321,7 @@ private:
 	Framework::OpenGl::CShader GenerateVertexShader(const SHADERCAPS&);
 	Framework::OpenGl::CShader GenerateFragmentShader(const SHADERCAPS&);
 	std::string GenerateTexCoordClampingSection(TEXTURE_CLAMP_MODE, const char*);
-	std::string GenerateAlphaTestSection(ALPHA_TEST_METHOD);
+	std::string GenerateAlphaTestSection(ALPHA_TEST_METHOD, ALPHA_TEST_FAIL_METHOD);
 
 	Framework::OpenGl::ProgramPtr GeneratePresentProgram();
 	Framework::OpenGl::CBuffer GeneratePresentVertexBuffer();
