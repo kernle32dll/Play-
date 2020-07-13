@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <algorithm>
+#include <string.h>
 #include "../uint128.h"
 #include "../Ps2Const.h"
 #include "../Log.h"
@@ -33,8 +34,6 @@ CGIF::CGIF(CGSHandler*& gs, uint8* ram, uint8* spr)
 
 void CGIF::Reset()
 {
-	m_path3Masked = false;
-	m_activePath = 0;
 	m_loops = 0;
 	m_cmd = 0;
 	m_regs = 0;
@@ -43,13 +42,15 @@ void CGIF::Reset()
 	m_eop = false;
 	m_qtemp = QTEMP_INIT;
 	m_signalState = SIGNAL_STATE_NONE;
+
+	memset(&m_Stat, 0, sizeof(STATUS));
 }
 
 void CGIF::LoadState(Framework::CZipArchiveReader& archive)
 {
 	CRegisterStateFile registerFile(*archive.BeginReadFile(STATE_REGS_XML));
-	m_path3Masked = registerFile.GetRegister32(STATE_REGS_M3P) != 0;
-	m_activePath = registerFile.GetRegister32(STATE_REGS_ACTIVEPATH);
+	m_Stat.p3MaskedByMode = registerFile.GetRegister32(STATE_REGS_M3P) != 0;
+	m_Stat.activePath = registerFile.GetRegister32(STATE_REGS_ACTIVEPATH);
 	m_loops = static_cast<uint16>(registerFile.GetRegister32(STATE_REGS_LOOPS));
 	m_cmd = static_cast<uint8>(registerFile.GetRegister32(STATE_REGS_CMD));
 	m_regs = static_cast<uint8>(registerFile.GetRegister32(STATE_REGS_REGS));
@@ -62,8 +63,8 @@ void CGIF::LoadState(Framework::CZipArchiveReader& archive)
 void CGIF::SaveState(Framework::CZipArchiveWriter& archive)
 {
 	CRegisterStateFile* registerFile = new CRegisterStateFile(STATE_REGS_XML);
-	registerFile->SetRegister32(STATE_REGS_M3P, m_path3Masked ? 1 : 0);
-	registerFile->SetRegister32(STATE_REGS_ACTIVEPATH, m_activePath);
+	registerFile->SetRegister32(STATE_REGS_M3P, m_Stat.p3MaskedByMode ? 1 : 0);
+	registerFile->SetRegister32(STATE_REGS_ACTIVEPATH, m_Stat.activePath);
 	registerFile->SetRegister32(STATE_REGS_LOOPS, m_loops);
 	registerFile->SetRegister32(STATE_REGS_CMD, m_cmd);
 	registerFile->SetRegister32(STATE_REGS_REGS, m_regs);
@@ -276,7 +277,7 @@ uint32 CGIF::ProcessSinglePacket(const uint8* memory, uint32 memorySize, uint32 
 	                          packetMetadata.pathIndex, address, end - address);
 #endif
 
-	assert((m_activePath == 0) || (m_activePath == packetMetadata.pathIndex));
+	assert((m_Stat.activePath == 0) || (m_Stat.activePath == packetMetadata.pathIndex));
 	m_signalState = SIGNAL_STATE_NONE;
 
 	uint32 start = address;
@@ -287,7 +288,7 @@ uint32 CGIF::ProcessSinglePacket(const uint8* memory, uint32 memorySize, uint32 
 			if(m_eop)
 			{
 				m_eop = false;
-				m_activePath = 0;
+				m_Stat.activePath = 0;
 				break;
 			}
 
@@ -316,7 +317,7 @@ uint32 CGIF::ProcessSinglePacket(const uint8* memory, uint32 memorySize, uint32 
 
 			if(m_regs == 0) m_regs = 0x10;
 			m_regsTemp = m_regs;
-			m_activePath = packetMetadata.pathIndex;
+			m_Stat.activePath = packetMetadata.pathIndex;
 			continue;
 		}
 		switch(m_cmd)
@@ -348,7 +349,7 @@ uint32 CGIF::ProcessSinglePacket(const uint8* memory, uint32 memorySize, uint32 
 		if(m_eop)
 		{
 			m_eop = false;
-			m_activePath = 0;
+			m_Stat.activePath = 0;
 		}
 	}
 
@@ -365,7 +366,7 @@ uint32 CGIF::ProcessMultiplePackets(const uint8* memory, uint32 memorySize, uint
 {
 	//This will attempt to process everything from [address, end[ even if it contains multiple GIF packets
 
-	if((m_activePath != 0) && (m_activePath != packetMetadata.pathIndex))
+	if((m_Stat.activePath != 0) && (m_Stat.activePath != packetMetadata.pathIndex))
 	{
 		//Packet transfer already active on a different path, we can't process this one
 		return 0;
@@ -426,9 +427,10 @@ uint32 CGIF::GetRegister(uint32 address)
 	switch(address)
 	{
 	case GIF_STAT:
-		if(m_path3Masked)
+		result = m_Stat;
+
+		if(m_Stat.p3MaskedByVIF || m_Stat.p3MaskedByMode)
 		{
-			result |= GIF_STAT_M3P;
 			//Indicate that FIFO is full (15 qwords) (needed for GTA: San Andreas)
 			result |= (0x1F << 24);
 		}
@@ -451,6 +453,36 @@ void CGIF::SetRegister(uint32 address, uint32 value)
 #ifdef _DEBUG
 	DisassembleSet(address, value);
 #endif
+
+	switch(address)
+	{
+	case GIF_CTRL:
+	{
+		CTRL ctrlCmd = *(CTRL*)&(value);
+
+		if(ctrlCmd.reset)
+		{
+			// TODO: Does "reset gif" mean "reset the _whole_ GIF"?
+			this->Reset();
+			return;
+		}
+
+		m_Stat.tempStop = ctrlCmd.tempStop;
+
+		break;
+	}
+	case GIF_MODE:
+	{
+		MODE modeCmd = *(MODE*)&(value);
+
+		m_Stat.intMode = modeCmd.intMode;
+		m_Stat.p3MaskedByMode = modeCmd.maskP3;
+		break;
+	}
+	default:
+		CLog::GetInstance().Warn(LOG_NAME, "Writing unknown register 0x%08X, 0x%08X.\r\n", address, value);
+		break;
+	}
 }
 
 CGSHandler* CGIF::GetGsHandler()
@@ -460,7 +492,7 @@ CGSHandler* CGIF::GetGsHandler()
 
 void CGIF::SetPath3Masked(bool masked)
 {
-	m_path3Masked = masked;
+	m_Stat.p3MaskedByVIF = masked;
 }
 
 void CGIF::DisassembleGet(uint32 address)
@@ -480,6 +512,16 @@ void CGIF::DisassembleSet(uint32 address, uint32 value)
 {
 	switch(address)
 	{
+	case GIF_CTRL:
+	{
+		CLog::GetInstance().Print(LOG_NAME, "GIF_CTRL = 0x%08X\r\n", value);
+		break;
+	}
+	case GIF_MODE:
+	{
+		CLog::GetInstance().Print(LOG_NAME, "GIF_MODE = 0x%08X\r\n", value);
+		break;
+	}
 	default:
 		CLog::GetInstance().Warn(LOG_NAME, "Writing unknown register 0x%08X, 0x%08X.\r\n", address, value);
 		break;
