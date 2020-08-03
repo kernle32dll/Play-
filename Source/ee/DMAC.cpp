@@ -383,6 +383,11 @@ uint32 CDMAC::GetRegister(uint32 nAddress)
 	case D4_CHCR + 0x0:
 		return m_D4.ReadCHCR();
 		break;
+
+    case D4_CHCR + 0x1:
+        //This is done by Enter The Matrix
+        return m_D4.ReadCHCR() >> 8;
+        break;
 	case D4_CHCR + 0x4:
 	case D4_CHCR + 0x8:
 	case D4_CHCR + 0xC:
