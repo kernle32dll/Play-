@@ -772,8 +772,6 @@ void CSifCmd::SifCallRpc(CMIPS& context)
 	uint32 endFctAddr = context.m_pMemoryMap->GetWord(context.m_State.nGPR[CMIPS::SP].nV0 + 0x1C);
 	uint32 endParam = context.m_pMemoryMap->GetWord(context.m_State.nGPR[CMIPS::SP].nV0 + 0x20);
 
-	assert(mode == 0);
-
 	CLog::GetInstance().Print(LOG_NAME, FUNCTION_SIFCALLRPC "(clientDataAddr = 0x%08X, rpcNumber = 0x%08X, mode = 0x%08X, sendAddr = 0x%08X, sendSize = 0x%08X, "
 	                                                        "recvAddr = 0x%08X, recvSize = 0x%08X, endFctAddr = 0x%08X, endParam = 0x%08X);\r\n",
 	                          clientDataAddr, rpcNumber, mode, sendAddr, sendSize, recvAddr, recvSize, endFctAddr, endParam);
@@ -807,7 +805,16 @@ void CSifCmd::SifCallRpc(CMIPS& context)
 	callPacket.sendSize = sendSize;
 	callPacket.recv = recvAddr;
 	callPacket.recvSize = recvSize;
-	callPacket.recvMode = 1;
+
+	if(mode & 1)
+	{
+		callPacket.recvMode = (endFctAddr != 0);
+	}
+	else
+	{
+		callPacket.recvMode = 1;
+	}
+
 	callPacket.clientDataAddr = clientDataAddr;
 	callPacket.serverDataAddr = clientData->serverDataAddr;
 
