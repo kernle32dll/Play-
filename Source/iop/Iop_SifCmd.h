@@ -57,6 +57,7 @@ namespace Iop
 			uint32 rsize;
 			uint32 rid;
 
+			uint32 nextServer;
 			uint32 queueAddr;
 
 			//This field is not a part of the real structure, added for bookkeeping reasons.
