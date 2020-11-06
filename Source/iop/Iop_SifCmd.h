@@ -57,6 +57,7 @@ namespace Iop
 			uint32 rsize;
 			uint32 rid;
 
+            uint32 nextServer;
 			uint32 queueAddr;
 		};
 		static_assert(sizeof(SIFRPCSERVERDATA) <= 0x44, "Size of SIFRPCSERVERDATA must be less or equal to 68 bytes.");
