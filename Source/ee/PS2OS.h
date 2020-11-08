@@ -370,6 +370,7 @@ private:
 	void sc_ReferSemaStatus();
 	void sc_GetOsdConfigParam();
 	void sc_FlushCache();
+    void sc_SifStopDma();
 	void sc_GsGetIMR();
 	void sc_GsPutIMR();
 	void sc_SetVSyncFlag();
