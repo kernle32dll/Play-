@@ -476,7 +476,9 @@ void CSifCmd::ProcessInvocation(uint32 serverDataAddr, uint32 methodId, uint32* 
 	serverData->rid = methodId;
 	serverData->rsize = size;
 
-	queueData->serverDataStart = serverDataAddr;
+	assert(queueData->serverDataLink == 0);
+	assert(queueData->serverDataStart == serverDataAddr);
+	queueData->serverDataLink = serverDataAddr;
 
 	auto thread = m_bios.GetThread(queueData->threadId);
 	assert(thread->status == CIopBios::THREAD_STATUS_SLEEPING);
@@ -851,7 +853,6 @@ void CSifCmd::SifRegisterRpc(CMIPS& context)
 		serverData->cfunction = cfunction;
 		serverData->cbuffer = cbuffer;
 		serverData->queueAddr = queueAddr;
-		serverData->nextServer = 0;
 	}
 
 	if(queueAddr != 0)
@@ -890,15 +891,8 @@ uint32 CSifCmd::SifGetNextRequest(uint32 queueDataAddr)
 	if(queueDataAddr != 0)
 	{
 		auto queueData = reinterpret_cast<SIFRPCQUEUEDATA*>(m_ram + queueDataAddr);
-
-		result = queueData->serverDataStart;
-
-		queueData->active = result != 0;
-		if(result != 0)
-		{
-			auto server = reinterpret_cast<SIFRPCSERVERDATA*>(m_ram + queueData->serverDataStart);
-			queueData->serverDataStart = server->nextServer;
-		}
+		result = queueData->serverDataLink;
+		queueData->serverDataLink = 0;
 	}
 	return result;
 }
