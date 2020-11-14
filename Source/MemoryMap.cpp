@@ -222,7 +222,7 @@ void CMemoryMap_LSBF::SetWord(uint32 nAddress, uint32 nValue)
 	const auto e = GetMap(m_writeMap, nAddress);
 	if(!e)
 	{
-		CLog::GetInstance().Print(LOG_NAME, "Wrote word to unmapped memory (0x%08X, 0x%08X).\r\n", nAddress, nValue);
+		CLog::GetInstance().Warn(LOG_NAME, "Wrote word to unmapped memory (0x%08X, 0x%08X).\r\n", nAddress, nValue);
 		return;
 	}
 	switch(e->nType)
@@ -234,6 +234,7 @@ void CMemoryMap_LSBF::SetWord(uint32 nAddress, uint32 nValue)
 		e->handler(nAddress, nValue);
 		break;
 	default:
+        CLog::GetInstance().Warn(LOG_NAME, "Wrote word to unmapped memory 2 (0x%08X, 0x%08X).\r\n", nAddress, nValue);
 		assert(0);
 		break;
 	}

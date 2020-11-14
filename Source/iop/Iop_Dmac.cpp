@@ -125,6 +125,8 @@ uint32 CDmac::ReadRegister(uint32 address)
 		if(channel)
 		{
 			return channel->ReadRegister(address);
+		} else {
+            CLog::GetInstance().Warn(LOG_NAME, "Read an unhandled dmac channel register (0x%08X).\r\n", address);
 		}
 	}
 	break;
@@ -156,7 +158,9 @@ uint32 CDmac::WriteRegister(uint32 address, uint32 value)
 		if(channel)
 		{
 			channel->WriteRegister(address, value);
-		}
+		} else {
+            CLog::GetInstance().Warn(LOG_NAME, "Wrote to an unhandled dmac channel register (0x%08X).\r\n", address);
+        }
 	}
 	break;
 	}
