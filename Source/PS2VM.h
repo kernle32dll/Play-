@@ -81,6 +81,7 @@ public:
 	void TriggerFrameDump(const FrameDumpCallback&);
 
 	CPU_UTILISATION_INFO GetCpuUtilisationInfo() const;
+	void BootFromFile(const fs::path&);
 
 #ifdef DEBUGGER_INCLUDED
 	fs::path MakeDebugTagsPackagePath(const char*);
