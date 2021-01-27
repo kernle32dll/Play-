@@ -10,6 +10,11 @@ using namespace PS2;
 
 #define PADNUM (1)
 
+#define PAD_MODECURID   1
+#define PAD_MODECUREXID 2
+#define PAD_MODECUROFFS 3
+#define PAD_MODETABLE   4
+
 #define PAD_MODE_DIGITAL 4
 #define PAD_MODE_DUALSHOCK 7
 
@@ -53,13 +58,81 @@ bool CPadMan::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, 
 	case 0x80000100:
 		Open(args, argsSize, ret, retSize, ram);
 		break;
+	case 0x80000102:
+		// InfoAct
+		// TODO
+        break;
+    case 0x0000000C:
+	case 0x8000010B:
+	{
+		// GetPortMax
+		ret[3] = MAX_PADS;
+		break;
+	}
+	case 0x0000000D:
+	case 0x8000010C:
+	{
+		// GetSlotMax
+		ret[3] = 1;
+		break;
+	}
+	case 0x80000104:
+	{
+		// InfoMode
+		uint32 port = args[1];
+		uint32 slot = args[2];
+		uint32 infoMode = args[3];
+		int32 index = args[4];
+
+		if(infoMode == PAD_MODETABLE)
+		{
+			switch(index)
+			{
+			case -1:
+				// We support two modes....
+				ret[5] = 2;
+				break;
+			case 0:
+				// One is digital
+				ret[5] = PAD_MODE_DIGITAL;
+                break;
+			case 1:
+				// The other is Dualschock
+				ret[5] = PAD_MODE_DUALSHOCK;
+                break;
+			default:
+				// unknown mode index
+				ret[5] = -1;
+                break;
+			}
+		}
+		else if(infoMode == PAD_MODECURID || infoMode == PAD_MODECUREXID)
+		{
+			ret[5] = PAD_MODE_DUALSHOCK;
+		}
+
+		break;
+	}
 	case 0x80000105:
 		SetMainMode(args, argsSize, ret, retSize, ram);
 		break;
+	case 0x00000009:
+	case 0x80000108:
+        // GetButtonMask
+        // TODO
+        ret[3] = 0;
+		break;
+	case 0x0000000A:
+    case 0x80000109:
+		// SetButtonInfo
+        // TODO
+        ret[4] = 0;
+        break;
 	case 0x8000010D:
 		Close(args, argsSize, ret, retSize, ram);
 		break;
 	case 0x00000008:
+	case 0x80000107:
 		SetActuatorAlign(args, argsSize, ret, retSize, ram);
 		break;
 	case 0x00000010:
@@ -162,6 +235,7 @@ void CPadMan::SetMainMode(uint32* args, uint32 argsSize, uint32* ret, uint32 ret
 		}
 	}
 
+	// TODO: Shouldn't this be ret[5] = 0?
 	ret[3] = 1;
 }
 
