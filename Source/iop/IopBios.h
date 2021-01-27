@@ -20,12 +20,14 @@
 #include "Iop_Modload.h"
 #include "Iop_Loadcore.h"
 #include "Iop_LibSd.h"
+#include "Iop_SpuBase.h"
 #ifdef _IOP_EMULATE_MODULES
 #include "Iop_FileIo.h"
 #include "Iop_PadMan.h"
 #include "Iop_MtapMan.h"
 #include "Iop_Cdvdfsv.h"
 #include "Iop_McServ.h"
+#include "Iop_OsdSnd.h"
 #endif
 
 class CIopBios : public Iop::CBiosBase
@@ -134,7 +136,7 @@ public:
 		uint32 reserved[4];
 	};
 
-	CIopBios(CMIPS&, uint8*, uint32, uint8*);
+	CIopBios(CMIPS&, uint8*, uint32, uint8*, Iop::CSpu2&);
 	virtual ~CIopBios();
 
 	int32 LoadModule(const char*);
@@ -619,6 +621,8 @@ private:
 	FplList m_fpls;
 	VplList m_vpls;
 
+    Iop::CSpu2& m_spu2;
+
 	IopModuleMapType m_modules;
 
 	OsVariableWrapper<uint32> m_currentThreadId;
@@ -641,6 +645,7 @@ private:
 	Iop::MtapManPtr m_mtapman;
 	Iop::McServPtr m_mcserv;
 	Iop::CdvdfsvPtr m_cdvdfsv;
+    Iop::COsdSndPtr m_osdsnd;
 
 	std::map<std::string, Iop::ModulePtr> m_hleModules;
 #endif

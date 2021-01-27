@@ -37,7 +37,7 @@ CSubSystem::CSubSystem(bool ps2Mode)
 {
 	if(ps2Mode)
 	{
-		m_bios = std::make_shared<CIopBios>(m_cpu, m_ram, PS2::IOP_RAM_SIZE, m_scratchPad);
+		m_bios = std::make_shared<CIopBios>(m_cpu, m_ram, PS2::IOP_RAM_SIZE, m_scratchPad, m_spu2);
 	}
 	else
 	{

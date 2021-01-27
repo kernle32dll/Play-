@@ -90,11 +90,12 @@
 
 #define MODULE_ID_CDVD_EE_DRIVER 0x70000000
 
-CIopBios::CIopBios(CMIPS& cpu, uint8* ram, uint32 ramSize, uint8* spr)
+CIopBios::CIopBios(CMIPS& cpu, uint8* ram, uint32 ramSize, uint8* spr, Iop::CSpu2& spu2)
     : m_cpu(cpu)
     , m_ram(ram)
     , m_ramSize(ramSize)
     , m_spr(spr)
+    , m_spu2(spu2)
     , m_threadFinishAddress(0)
     , m_returnFromExceptionAddress(0)
     , m_idleFunctionAddress(0)
@@ -256,6 +257,10 @@ void CIopBios::Reset(const Iop::SifManPtr& sifMan)
 		m_padman = std::make_shared<Iop::CPadMan>();
 		m_mtapman = std::make_shared<Iop::CMtapMan>();
 	}
+    {
+        m_osdsnd = std::make_shared<Iop::COsdSnd>(m_ram, *m_sifMan, *m_sysmem, m_spu2);
+        RegisterModule(m_osdsnd);
+    }
 
 	m_hleModules.insert(std::make_pair("rom0:SIO2MAN", m_padman));
 	m_hleModules.insert(std::make_pair("rom0:PADMAN", m_padman));
@@ -266,6 +271,7 @@ void CIopBios::Reset(const Iop::SifManPtr& sifMan)
 	m_hleModules.insert(std::make_pair("rom0:MCSERV", m_mcserv));
 	m_hleModules.insert(std::make_pair("rom0:XMCMAN", m_mcserv));
 	m_hleModules.insert(std::make_pair("rom0:XMCSERV", m_mcserv));
+    m_hleModules.insert(std::make_pair("rom0:OSDSND", m_osdsnd));
 
 #endif
 
