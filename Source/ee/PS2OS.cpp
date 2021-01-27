@@ -1097,6 +1097,7 @@ void CPS2OS::ThreadShakeAndBake()
 		if(m_threadSchedule.IsEmpty())
 		{
 			//No thread ready to be executed
+            m_idleThreadId = 1;
 			nextThreadId = m_idleThreadId;
 		}
 		else
