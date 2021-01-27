@@ -367,8 +367,7 @@ uint32 CGSHandler::ReadPrivRegister(uint32 nAddress)
 	uint32 nData = 0;
 	switch(nAddress & ~0x0F)
 	{
-	case GS_CSR:
-	case GS_CSR_ALT:
+    default:
 		//Force CSR to have the H-Blank bit set.
 		{
 			std::lock_guard<std::recursive_mutex> registerMutexLock(m_registerMutex);
@@ -382,10 +381,6 @@ uint32 CGSHandler::ReadPrivRegister(uint32 nAddress)
 		break;
 	case GS_SIGLBLID:
 		R_REG(nAddress, nData, m_nSIGLBLID);
-		break;
-	default:
-		CLog::GetInstance().Warn(LOG_NAME, "Read an unhandled priviledged register (0x%08X).\r\n", nAddress);
-		nData = 0xCCCCCCCC;
 		break;
 	}
 	return nData;
