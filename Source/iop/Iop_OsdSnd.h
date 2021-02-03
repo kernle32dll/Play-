@@ -64,8 +64,8 @@ namespace Iop
 			uint16 note;
 			uint16 sample_note;
 			int16 envelopevalue_current;
-			uint32* sample_addr;
-			uint32* loop_addr;
+			uint32 sample_addr;
+			uint32 loop_addr;
 			int32 attack_mode;
 			int32 sustain_mode;
 			int32 release_mode;
@@ -77,7 +77,7 @@ namespace Iop
 			uint16 adsr1;
 			uint16 adsr2;
 		};
-		static_assert(sizeof(VoiceAttributes) == 80, "VoiceAttributes must be 80 bytes long.");
+		static_assert(sizeof(VoiceAttributes) == 64, "VoiceAttributes must be 64 bytes long.");
 	};
 
 	typedef std::shared_ptr<COsdSnd> COsdSndPtr;
