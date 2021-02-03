@@ -205,6 +205,8 @@ void CGSH_Vulkan::FlipImpl()
 	auto fb = make_convertible<DISPFB>(dispInfo.first);
 	auto d = make_convertible<DISPLAY>(dispInfo.second);
 
+	CLog::GetInstance().Warn("gs_stuff", "FB: 0x%08X, FB ptr: 0x%08X).\r\n", dispInfo.first, fb.GetBufPtr());
+
 	unsigned int dispWidth = (d.nW + 1) / (d.nMagX + 1);
 	unsigned int dispHeight = (d.nH + 1);
 
