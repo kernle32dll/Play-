@@ -132,6 +132,8 @@ void CGSH_OpenGL::FlipImpl()
 	auto fb = make_convertible<DISPFB>(dispInfo.first);
 	auto dispBounds = GetDisplayBounds(dispInfo.second);
 
+	CLog::GetInstance().Warn("gs_stuff", "FB: 0x%08X, FB ptr: 0x%08X).\r\n", dispInfo.first, fb.GetBufPtr());
+
 	FramebufferPtr framebuffer;
 	for(const auto& candidateFramebuffer : m_framebuffers)
 	{
