@@ -886,9 +886,43 @@ protected:
 	//Private Registers
 	enum CRT_MODE : uint32
 	{
+		// Modes and comments taken from:
+		// https://github.com/rickgaiser/gsKit/blob/0261c3888323c9588ffbb77c66e6088331ccf2ed/ee/gs/include/gsInit.h
+
 		CRT_MODE_NTSC = 0x02,
 		CRT_MODE_PAL = 0x03,
+
+		/// VGA 640x480 @ 60-85Hz
+		CRT_MODE_VGA_640_60 = 0x1A,
+		CRT_MODE_VGA_640_72 = 0x1B,
 		CRT_MODE_VGA_640_75 = 0x1C,
+		CRT_MODE_VGA_640_85 = 0x1D,
+
+		/// VGA 800x600 @ 60-85Hz
+		CRT_MODE_VGA_800_56 = 0x2A,
+		CRT_MODE_VGA_800_60 = 0x2B,
+		CRT_MODE_VGA_800_72 = 0x2C,
+		CRT_MODE_VGA_800_75 = 0x2D,
+		CRT_MODE_VGA_800_85 = 0x2E,
+
+		/// VGA 1024x768 @ 60-85Hz
+		CRT_MODE_VGA_1024_60 = 0x3B,
+		CRT_MODE_VGA_1024_70 = 0x3C,
+		CRT_MODE_VGA_1024_75 = 0x3D,
+		CRT_MODE_VGA_1024_85 = 0x3E,
+
+		/// VGA 1280x1024 @ 60-75Hz
+		CRT_MODE_VGA_1280_60 = 0x4A,
+		CRT_MODE_VGA_1280_75 = 0x4B,
+
+		/// DTV 480 Progressive Scan (720x480)
+		CRT_MODE_DTV_480P = 0x50,
+		/// DTV 576 Progressive Scan (720x576)
+		CRT_MODE_DTV_576P = 0x53,
+		/// DTV 1080 Interlaced (1920x1080)
+		CRT_MODE_DTV_1080I = 0x51,
+		/// DTV 720 Progressive Scan (1280x720)
+		CRT_MODE_DTV_720P = 0x52,
 	};
 
 	struct SMODE2 : public convertible<uint64>

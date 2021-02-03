@@ -1140,13 +1140,45 @@ unsigned int CGSHandler::GetCrtWidth() const
 {
 	switch(m_crtMode)
 	{
-	default:
-		assert(false);
-		[[fallthrough]];
 	case CRT_MODE_NTSC:
 	case CRT_MODE_PAL:
+	case CRT_MODE_VGA_640_60:
+	case CRT_MODE_VGA_640_72:
 	case CRT_MODE_VGA_640_75:
+	case CRT_MODE_VGA_640_85:
 		return 640;
+		break;
+	case CRT_MODE_VGA_800_56:
+	case CRT_MODE_VGA_800_60:
+	case CRT_MODE_VGA_800_72:
+	case CRT_MODE_VGA_800_75:
+	case CRT_MODE_VGA_800_85:
+		return 800;
+		break;
+	case CRT_MODE_VGA_1024_60:
+	case CRT_MODE_VGA_1024_70:
+	case CRT_MODE_VGA_1024_75:
+	case CRT_MODE_VGA_1024_85:
+		return 1024;
+		break;
+	case CRT_MODE_VGA_1280_60:
+	case CRT_MODE_VGA_1280_75:
+		return 1280;
+		break;
+	case CRT_MODE_DTV_480P:
+	case CRT_MODE_DTV_576P:
+		return 720;
+		break;
+	case CRT_MODE_DTV_720P:
+		return 1280;
+		break;
+	case CRT_MODE_DTV_1080I:
+		return 1920;
+		break;
+	default:
+		assert(0);
+		return 640;
+		break;
 	}
 }
 
@@ -1154,15 +1186,49 @@ unsigned int CGSHandler::GetCrtHeight() const
 {
 	switch(m_crtMode)
 	{
-	default:
-		assert(false);
-		[[fallthrough]];
 	case CRT_MODE_NTSC:
 		return 448;
+		break;
 	case CRT_MODE_PAL:
 		return 512;
+		break;
+	case CRT_MODE_VGA_640_60:
+	case CRT_MODE_VGA_640_72:
 	case CRT_MODE_VGA_640_75:
+	case CRT_MODE_VGA_640_85:
+	case CRT_MODE_DTV_480P:
 		return 480;
+		break;
+	case CRT_MODE_VGA_800_56:
+	case CRT_MODE_VGA_800_60:
+	case CRT_MODE_VGA_800_72:
+	case CRT_MODE_VGA_800_75:
+	case CRT_MODE_VGA_800_85:
+		return 600;
+		break;
+	case CRT_MODE_VGA_1024_60:
+	case CRT_MODE_VGA_1024_70:
+	case CRT_MODE_VGA_1024_75:
+	case CRT_MODE_VGA_1024_85:
+		return 768;
+		break;
+	case CRT_MODE_VGA_1280_60:
+	case CRT_MODE_VGA_1280_75:
+		return 1024;
+		break;
+	case CRT_MODE_DTV_576P:
+		return 576;
+		break;
+	case CRT_MODE_DTV_720P:
+		return 720;
+		break;
+	case CRT_MODE_DTV_1080I:
+		return 1080;
+		break;
+	default:
+		assert(0);
+		return 448;
+		break;
 	}
 }
 
