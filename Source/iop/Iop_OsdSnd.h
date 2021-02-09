@@ -14,6 +14,11 @@
 #define SPU_VOICE_VOL_LEFT (1 << 0)
 #define SPU_VOICE_VOL_RIGHT (1 << 1)
 #define SPU_VOICE_PITCH (1 << 4)
+#define SPU_VOICE_SAMPLE_ADDR (1 << 7)
+#define SPU_VOICE_LOOP_ADDR (1 << 16)
+
+#define SPU_COMMON_MASTER_VOL_LEFT (1 << 0)
+#define SPU_COMMON_MASTER_VOL_RIGHT (1 << 1)
 
 namespace Iop
 {
@@ -53,6 +58,14 @@ namespace Iop
 			int16 right;
 		};
 
+		struct CommonAttributes
+		{
+			uint32 mask;
+			Volume vol;
+			Volume vol_mode;
+			Volume vol_current;
+		};
+
 		struct VoiceAttributes
 		{
 			uint32 voice;
@@ -78,6 +91,9 @@ namespace Iop
 			uint16 adsr2;
 		};
 		static_assert(sizeof(VoiceAttributes) == 64, "VoiceAttributes must be 64 bytes long.");
+
+		uint16 GetAddressLo(uint32 address);
+		uint16 GetAddressHi(uint32 address);
 	};
 
 	typedef std::shared_ptr<COsdSnd> COsdSndPtr;

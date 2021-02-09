@@ -24,6 +24,7 @@ namespace Iop
 
 			uint32 ReadRegister(uint32, uint32);
 			uint32 WriteRegister(uint32, uint32);
+            uint32 WriteRegisterChannel(unsigned int, uint32, uint32);
 
 			enum REGISTERS
 			{
@@ -107,7 +108,6 @@ namespace Iop
 			uint32 WriteRegisterCore(unsigned int, uint32, uint32);
 
 			uint32 ReadRegisterChannel(unsigned int, uint32, uint32);
-			uint32 WriteRegisterChannel(unsigned int, uint32, uint32);
 
 			void LogRead(uint32, uint32);
 			void LogWrite(uint32, uint32);
