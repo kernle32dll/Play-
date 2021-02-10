@@ -969,6 +969,39 @@ void CGSH_OpenGL::SetupFramebuffer(uint64 frameReg, uint64 zbufReg, uint64 sciss
 		m_depthbuffers.push_back(depthbuffer);
 	}
 
+	// Persist changes to the framebuffer
+	if(m_renderState.framebufferHandle != 0 && m_renderState.framebufferHandle != framebuffer->m_framebuffer)
+	{
+		auto framebufferIterator = std::find_if(m_framebuffers.begin(), m_framebuffers.end(),
+		                                        [&](const FramebufferPtr& framebuffer) {
+			                                        return (framebuffer->m_framebuffer == m_renderState.framebufferHandle);
+		                                        });
+
+		if(framebufferIterator != std::end(m_framebuffers))
+		{
+			const auto& framebuffer = (*framebufferIterator);
+
+			if(framebuffer->m_psm == PSMCT32)
+			{
+				auto imgbuffer = Framework::CBitmap(framebuffer->m_width * m_fbScale, framebuffer->m_height * m_fbScale, 32);
+				glReadPixels(0, 0, framebuffer->m_width * m_fbScale, framebuffer->m_height * m_fbScale, GL_RGBA, GL_UNSIGNED_BYTE, imgbuffer.GetPixels());
+
+				//Write back to RAM
+				{
+					CGsPixelFormats::CPixelIndexorPSMCT32 indexor(m_pRAM, framebuffer->m_basePtr, framebuffer->m_width / 64);
+					for(uint32 y = 0; y < framebuffer->m_height; y++)
+					{
+						for(uint32 x = 0; x < framebuffer->m_width; x++)
+						{
+							auto pixel = imgbuffer.GetPixel(x * m_fbScale, y * m_fbScale);
+							indexor.SetPixel(x, y, MakeColor(pixel.r, pixel.g, pixel.b, pixel.a));
+						}
+					}
+				}
+			}
+		};
+	}
+
 	assert(framebuffer->m_width == depthbuffer->m_width);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->m_framebuffer);
