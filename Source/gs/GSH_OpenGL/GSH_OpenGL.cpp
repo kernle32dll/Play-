@@ -313,6 +313,10 @@ void CGSH_OpenGL::CheckExtensions()
 		{
 			m_hasFramebufferFetchExtension = true;
 		}
+		else if(!strcmp(extensionName, "GL_ARM_shader_framebuffer_fetch_depth_stencil"))
+		{
+			m_hasFramebufferDepthFetchExtension = true;
+		}
 	}
 }
 

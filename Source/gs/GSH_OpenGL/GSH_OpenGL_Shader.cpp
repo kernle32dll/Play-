@@ -139,12 +139,18 @@ Framework::OpenGl::CShader CGSH_OpenGL::GenerateFragmentShader(const SHADERCAPS&
 
 	bool writeDestAlphaTest = caps.hasDestAlphaTest && m_hasFramebufferFetchExtension;
 	bool useFramebufferFetch = (caps.hasDestAlphaTest || caps.hasAlphaTest) && m_hasFramebufferFetchExtension;
+	bool useFramebufferDepthFetch = (caps.hasAlphaTest) && m_hasFramebufferDepthFetchExtension;
 
 	shaderBuilder << GLSL_VERSION << std::endl;
 
 	if(useFramebufferFetch)
 	{
 		shaderBuilder << "#extension GL_EXT_shader_framebuffer_fetch : require" << std::endl;
+	}
+
+	if(useFramebufferDepthFetch)
+	{
+		shaderBuilder << "#extension GL_ARM_shader_framebuffer_fetch_depth_stencil : require" << std::endl;
 	}
 
 	shaderBuilder << "precision mediump float;" << std::endl;
@@ -352,6 +358,11 @@ Framework::OpenGl::CShader CGSH_OpenGL::GenerateFragmentShader(const SHADERCAPS&
 		shaderBuilder << "	bool outputAlpha = true;" << std::endl;
 	}
 
+	if(useFramebufferDepthFetch)
+	{
+		shaderBuilder << "	bool outputDepth = true;" << std::endl;
+	}
+
 	if(caps.hasAlphaTest)
 	{
 		shaderBuilder << GenerateAlphaTestSection(static_cast<ALPHA_TEST_METHOD>(caps.alphaTestMethod), static_cast<ALPHA_TEST_FAIL_METHOD>(caps.alphaFailMethod));
@@ -413,7 +424,18 @@ Framework::OpenGl::CShader CGSH_OpenGL::GenerateFragmentShader(const SHADERCAPS&
 
 	// ----------------------
 
-	shaderBuilder << "	gl_FragDepth = v_depth;" << std::endl;
+	if(useFramebufferDepthFetch)
+	{
+		shaderBuilder << "	if(writeDepth) {" << std::endl;
+		shaderBuilder << "		gl_FragDepth = v_depth;" << std::endl;
+		shaderBuilder << "	} else {" << std::endl;
+		shaderBuilder << "		gl_FragDepth = gl_LastFragDepthARM;" << std::endl;
+		shaderBuilder << "	}" << std::endl;
+	}
+	else
+	{
+		shaderBuilder << "	gl_FragDepth = v_depth;" << std::endl;
+	}
 
 	// ----------------------
 
@@ -509,10 +531,17 @@ std::string CGSH_OpenGL::GenerateAlphaTestSection(ALPHA_TEST_METHOD testMethod, 
 		break;
 	case ALPHA_TEST_FAIL_FBONLY:
 		// Only write color and alpha
-		// TODO: We cannot prevent depth from being written at the moment
-		assert(0);
-		// Failure note: We rather accept writing depth here, than discarding the
-		// whole pixel, as most games work better with this hack.
+		if(m_hasFramebufferDepthFetchExtension)
+		{
+			shaderBuilder << "	outputDepth = false;" << std::endl;
+		}
+		else
+		{
+			// TODO: We cannot prevent depth from being written at the moment
+			assert(0);
+			// Failure note: We rather accept writing depth here, than discarding the
+			// whole pixel, as most games work better with this hack.
+		}
 		break;
 	case ALPHA_TEST_FAIL_ZBONLY:
 		// Only write depth
@@ -531,11 +560,15 @@ std::string CGSH_OpenGL::GenerateAlphaTestSection(ALPHA_TEST_METHOD testMethod, 
 		break;
 	case ALPHA_TEST_FAIL_RGBONLY:
 		// Only write color
-		if(m_hasFramebufferFetchExtension)
+		if(m_hasFramebufferFetchExtension && m_hasFramebufferDepthFetchExtension)
 		{
 			shaderBuilder << "	outputAlpha = false;" << std::endl;
-
-			// TODO: Prevent depth writing
+			shaderBuilder << "	outputDepth = false;" << std::endl;
+		}
+		else if(m_hasFramebufferFetchExtension)
+		{
+			shaderBuilder << "	outputAlpha = false;" << std::endl;
+			// TODO: Prevent depth writing without extension
 			assert(0);
 			// Failure note: We rather accept writing depth here, than discarding the
 			// whole pixel, as most games work better with this hack.

@@ -463,4 +463,5 @@ private:
 	VertexBuffer m_vertexBuffer;
 
 	bool m_hasFramebufferFetchExtension = false;
+	bool m_hasFramebufferDepthFetchExtension = false;
 };
