@@ -225,10 +225,10 @@ Framework::OpenGl::CShader CGSH_OpenGL::GenerateFragmentShader(const SHADERCAPS&
 		switch(caps.destAlphaTestRef)
 		{
 		case 0:
-			shaderBuilder << "	if(fragColor.a >= 0.5) discard;";
+			shaderBuilder << "	if(fragColor.a > 0.0) discard;";
 			break;
 		case 1:
-			shaderBuilder << "	if(fragColor.a < 0.5) discard;";
+			shaderBuilder << "	if(fragColor.a < 1.0) discard;";
 			break;
 		}
 	}
