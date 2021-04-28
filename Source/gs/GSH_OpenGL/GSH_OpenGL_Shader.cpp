@@ -429,7 +429,7 @@ Framework::OpenGl::CShader CGSH_OpenGL::GenerateFragmentShader(const SHADERCAPS&
 		shaderBuilder << "	if(outputDepth) {" << std::endl;
 		shaderBuilder << "		gl_FragDepth = v_depth;" << std::endl;
 		shaderBuilder << "	} else {" << std::endl;
-		shaderBuilder << "		gl_FragDepth = gl_LastFragDepthARM;" << std::endl;
+		shaderBuilder << "		gl_FragDepth = gl_LastFragDepthARM ∗ 2.0 − 1.0;" << std::endl;
 		shaderBuilder << "	}" << std::endl;
 	}
 	else
