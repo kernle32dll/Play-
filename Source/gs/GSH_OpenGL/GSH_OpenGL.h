@@ -95,6 +95,8 @@ private:
 		unsigned int hasDestAlphaTest : 1;
 		unsigned int destAlphaTestRef : 1;
 		unsigned int alphaFailMethod : 2;
+		unsigned int fba : 1;
+		unsigned int padding : 7;
 
 		bool isIndexedTextureSource() const
 		{
@@ -358,6 +360,7 @@ private:
 	void FillShaderCapsFromTexture(SHADERCAPS&, const uint64&, const uint64&, const uint64&, const uint64&);
 	void FillShaderCapsFromTest(SHADERCAPS&, const uint64&);
 	void FillShaderCapsFromAlpha(SHADERCAPS&, bool, const uint64&);
+	void FillShaderCapsFromFBA(SHADERCAPS&, const uint64&);
 
 	void SetupTexture(uint64, uint64, uint64, uint64, uint64);
 	static uint32 GetFramebufferBitDepth(uint32);

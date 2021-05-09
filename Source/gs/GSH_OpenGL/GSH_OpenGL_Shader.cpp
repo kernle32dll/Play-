@@ -400,13 +400,28 @@ Framework::OpenGl::CShader CGSH_OpenGL::GenerateFragmentShader(const SHADERCAPS&
 
 		shaderBuilder << "	if(outputAlpha)" << std::endl;
 		shaderBuilder << "	{" << std::endl;
-		shaderBuilder << "		fragColor.a = finalAlpha;" << std::endl;
+		if(caps.fba)
+		{
+			shaderBuilder << "		fragColor.a = clamp(finalAlpha + 0.5, 0.0, 1.0);" << std::endl;
+		}
+		else
+		{
+			shaderBuilder << "		fragColor.a = finalAlpha;" << std::endl;
+		}
 		shaderBuilder << "	}" << std::endl;
 	}
 	else
 	{
 		shaderBuilder << "	fragColor.xyz = finalColor;" << std::endl;
-		shaderBuilder << "	fragColor.a = finalAlpha;" << std::endl;
+
+		if(caps.fba)
+		{
+			shaderBuilder << "	fragColor.a = clamp(finalAlpha + 0.5, 0.0, 1.0);" << std::endl;
+		}
+		else
+		{
+			shaderBuilder << "	fragColor.a = finalAlpha;" << std::endl;
+		}
 
 		if(caps.colorOutputWhite)
 		{

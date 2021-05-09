@@ -539,6 +539,7 @@ void CGSH_OpenGL::SetRenderingContext(uint64 primReg)
 	uint64 clampReg = m_nReg[GS_REG_CLAMP_1 + context];
 	uint64 fogColReg = m_nReg[GS_REG_FOGCOL];
 	uint64 scissorReg = m_nReg[GS_REG_SCISSOR_1 + context];
+	uint64 fbaReg = m_nReg[GS_REG_FBA_1 + context];
 
 	//--------------------------------------------------------
 	//Get shader caps
@@ -548,6 +549,7 @@ void CGSH_OpenGL::SetRenderingContext(uint64 primReg)
 	FillShaderCapsFromTexture(shaderCaps, tex0Reg, tex1Reg, texAReg, clampReg);
 	FillShaderCapsFromTest(shaderCaps, testReg);
 	FillShaderCapsFromAlpha(shaderCaps, prim.nAlpha != 0, alphaReg);
+	FillShaderCapsFromFBA(shaderCaps, fbaReg);
 
 	if(prim.nFog)
 	{
@@ -1176,6 +1178,11 @@ void CGSH_OpenGL::FillShaderCapsFromAlpha(SHADERCAPS& shaderCaps, bool alphaEnab
 		//If we don't use the source color at all, output white to support some blending modes (ex: ones that doubles dest color).
 		shaderCaps.colorOutputWhite = (alpha.nA != ALPHABLEND_ABD_CS) && (alpha.nB != ALPHABLEND_ABD_CS) && (alpha.nD != ALPHABLEND_ABD_CS);
 	}
+}
+
+void CGSH_OpenGL::FillShaderCapsFromFBA(SHADERCAPS& shaderCaps, const uint64& fbaReg)
+{
+	shaderCaps.fba = fbaReg & 0x1;
 }
 
 void CGSH_OpenGL::SetupTexture(uint64 primReg, uint64 tex0Reg, uint64 tex1Reg, uint64 texAReg, uint64 clampReg)
