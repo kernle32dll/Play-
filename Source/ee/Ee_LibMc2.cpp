@@ -25,6 +25,11 @@ CLibMc2::CLibMc2(uint8* ram, CIopBios& iopBios)
 {
 	m_moduleLoadedConnection = m_iopBios.OnModuleLoaded.Connect(
 	    [this](const char* moduleName) { OnIopModuleLoaded(moduleName); });
+
+	for(bool& knownMemoryCard : m_knownMemoryCards)
+	{
+		knownMemoryCard = false;
+	}
 }
 
 uint32 CLibMc2::AnalyzeFunction(uint32 startAddress, int16 stackAlloc)
@@ -373,8 +378,11 @@ int32 CLibMc2::GetInfoAsync(uint32 socketId, uint32 infoPtr)
 	info->formatted = 1;
 	info->freeClusters = 0x1E81;
 
+	bool isKnownCard = m_knownMemoryCards[MC_PORT];
+	m_knownMemoryCards[MC_PORT] = true;
+
 	//Potential return value 0x81019003 -> Probably means memory card changed
-	m_lastResult = MC2_RESULT_OK;
+	m_lastResult = isKnownCard ? MC2_RESULT_OK : -1;
 	m_lastCmd = SYSCALL_MC2_GETINFO_ASYNC & 0xFF;
 
 	return 0;

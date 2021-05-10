@@ -50,6 +50,11 @@ namespace Ee
 			SYSCALL_RANGE_END,
 		};
 
+		enum
+		{
+			MAX_PORTS = 2,
+		};
+
 		CLibMc2(uint8*, CIopBios&);
 		void HandleSyscall(CMIPS&);
 		void HookLibMc2Functions();
@@ -100,5 +105,10 @@ namespace Ee
 		uint32 m_readFile2AsyncPtr = 0;
 		uint32 m_writeFile2AsyncPtr = 0;
 		uint32 m_checkAsyncPtr = 0;
+
+		// Keeps track, if the memory card in
+		// a given slot has already been read,
+		// or if it is a newly inserted card.
+		bool m_knownMemoryCards[MAX_PORTS];
 	};
 }
