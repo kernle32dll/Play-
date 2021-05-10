@@ -59,13 +59,17 @@ namespace Ee
 			SYSCALL_RANGE_END,
 		};
 
+		enum
+		{
+			MAX_PORTS = 2,
+		};
+
 		CLibMc2(uint8*, CPS2OS&, CIopBios&);
 
 		void Reset();
 
 		void SaveState(Framework::CZipArchiveWriter&);
 		void LoadState(Framework::CZipArchiveReader&);
-
 		void HandleSyscall(CMIPS&);
 		void NotifyVBlankStart();
 		void HookLibMc2Functions();
@@ -132,5 +136,10 @@ namespace Ee
 		uint32 m_lastResult = 0;
 		uint32 m_waitThreadId = WAIT_THREAD_ID_EMPTY;
 		uint32 m_waitVBlankCount = 0;
+
+		// Keeps track, if the memory card in
+		// a given slot has already been read,
+		// or if it is a newly inserted card.
+		bool m_knownMemoryCards[MAX_PORTS];
 	};
 }
