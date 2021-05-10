@@ -234,11 +234,12 @@ bool CMcServ::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, 
 		// Operation Winback 2 expects a delay here, otherwise it hangs trying to write a save file
 		Write(args, argsSize, ret, retSize, ram);
 		break;
-	case 0x0A:
+	case CMD_ID_FLUSH:
 	case 0x7A:
 		Flush(args, argsSize, ret, retSize, ram);
 		break;
 	case CMD_ID_CHDIR:
+	case 0x7B:
 		ChDir(args, argsSize, ret, retSize, ram);
 		break;
 	case CMD_ID_GETDIR:
