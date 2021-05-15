@@ -32,7 +32,8 @@ using namespace Iop;
 
 #define SEPARATOR_CHAR '/'
 
-#define CMD_DELAY_GETINFO 100000
+#define CMD_DELAY_DEFAULT 100000
+#define CMD_DELAY_GETINFO CMD_DELAY_DEFAULT
 
 #define STATE_MEMCARDS_FILE ("iop_mcserv/memcards.xml")
 #define STATE_MEMCARDS_NODE "Memorycards"
@@ -91,7 +92,6 @@ void CMcServ::CountTicks(uint32 ticks, CSifMan* sifMan)
 	moduleData->pendingCommandDelay -= std::min<uint32>(moduleData->pendingCommandDelay, ticks);
 	if(moduleData->pendingCommandDelay == 0)
 	{
-		assert(moduleData->pendingCommand == CMD_ID_GETINFO);
 		sifMan->SendCallReply(MODULE_ID, nullptr);
 		moduleData->pendingCommand = CMD_ID_NONE;
 	}
@@ -183,9 +183,16 @@ bool CMcServ::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, 
 		break;
 	default:
 		CLog::GetInstance().Warn(LOG_NAME, "Unknown RPC method invoked (0x%08X).\r\n", method);
-		break;
+		return true;
 	}
-	return true;
+
+	// Delay all commands a bit
+	// Fixes games, which receive the rpc response before they are ready to receive them
+	auto moduleData = reinterpret_cast<MODULEDATA*>(m_ram + m_moduleDataAddr);
+	moduleData->pendingCommand = method;
+	moduleData->pendingCommandDelay = CMD_DELAY_DEFAULT;
+
+	return false;
 }
 
 void CMcServ::BuildCustomCode()
