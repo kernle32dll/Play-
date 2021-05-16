@@ -24,6 +24,7 @@ using namespace Iop;
 #define FUNCTION_SIFGETSREG "SifGetSreg"
 #define FUNCTION_SIFSETCMDBUFFER "SifSetCmdBuffer"
 #define FUNCTION_SIFADDCMDHANDLER "SifAddCmdHandler"
+#define FUNCTION_SIFREMOVECMDHANDLER "SifRemoveCmdHandler"
 #define FUNCTION_SIFSENDCMD "SifSendCmd"
 #define FUNCTION_ISIFSENDCMD "iSifSendCmd"
 #define FUNCTION_SIFINITRPC "SifInitRpc"
@@ -212,6 +213,10 @@ void CSifCmd::Invoke(CMIPS& context, unsigned int functionId)
 		    context.m_State.nGPR[CMIPS::A0].nV0,
 		    context.m_State.nGPR[CMIPS::A1].nV0,
 		    context.m_State.nGPR[CMIPS::A2].nV0);
+		break;
+	case 11:
+		SifRemoveCmdHandler(
+		    context.m_State.nGPR[CMIPS::A0].nV0);
 		break;
 	case 12:
 	case 13:
@@ -731,6 +736,29 @@ void CSifCmd::SifAddCmdHandler(uint32 pos, uint32 handler, uint32 data)
 	else
 	{
 		CLog::GetInstance().Print(LOG_NAME, "SifAddCmdHandler - error command buffer too small or not set.\r\n");
+	}
+}
+
+void CSifCmd::SifRemoveCmdHandler(uint32 pos)
+{
+	CLog::GetInstance().Print(LOG_NAME, FUNCTION_SIFREMOVECMDHANDLER "(pos = 0x%08X);\r\n",
+	                          pos);
+
+	auto moduleData = reinterpret_cast<const MODULEDATA*>(m_ram + m_moduleDataAddr);
+	bool isSystemCommand = (pos & SYSTEM_COMMAND_ID) != 0;
+	uint32 cmd = pos & ~SYSTEM_COMMAND_ID;
+	uint32 cmdBufferAddr = isSystemCommand ? m_sysCmdBufferAddr : moduleData->usrCmdBufferAddr;
+	uint32 cmdBufferLen = isSystemCommand ? MAX_SYSTEM_COMMAND : moduleData->usrCmdBufferLen;
+
+	if((cmdBufferAddr != 0) && (cmd < cmdBufferLen))
+	{
+		auto& cmdDataEntry = reinterpret_cast<SIFCMDDATA*>(m_ram + cmdBufferAddr)[cmd];
+		cmdDataEntry.sifCmdHandler = 0;
+		cmdDataEntry.data = 0;
+	}
+	else
+	{
+		CLog::GetInstance().Print(LOG_NAME, "SifRemoveCmdHandler - error command buffer too small or not set.\r\n");
 	}
 }
 
