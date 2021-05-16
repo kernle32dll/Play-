@@ -232,6 +232,17 @@ private:
 		uint32 timezoneOffset : 11;
 	};
 
+	struct OSDCONFIGPARAM2 : public convertible<uint32>
+	{
+		uint8 format;
+		uint8 reserved : 4;
+		uint8 daylightSaving : 1;
+		uint8 timeFormat : 1;
+		uint8 dateFormat : 2;
+		uint8 version;
+		uint8 language;
+	};
+
 #ifdef DEBUGGER_INCLUDED
 	struct SYSCALL_NAME
 	{
@@ -382,6 +393,7 @@ private:
 	void sc_GetOsdConfigParam();
 	void sc_FlushCache();
 	void sc_SifStopDma();
+	void sc_GetOsdConfigParam2();
 	void sc_GsGetIMR();
 	void sc_GsPutIMR();
 	void sc_SetVSyncFlag();
