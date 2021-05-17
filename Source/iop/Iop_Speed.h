@@ -79,6 +79,18 @@ namespace Iop
 			REG_INTR_MASK = 0x1000002A,
 			REG_PIO_DIR = 0x1000002C,
 			REG_PIO_DATA = 0x1000002E,
+			REG_ATA_BEGIN = 0x10000040,
+			REG_ATA_DATA = REG_ATA_BEGIN + 0x00,
+			REG_ATA_ERROR = REG_ATA_BEGIN + 0x02,
+			REG_ATA_FEATURE = REG_ATA_ERROR,
+			REG_ATA_NSECTOR = REG_ATA_BEGIN + 0x04,
+			REG_ATA_SECTOR = REG_ATA_BEGIN + 0x06,
+			REG_ATA_LCYL = REG_ATA_BEGIN + 0x08,
+			REG_ATA_HCYL = REG_ATA_BEGIN + 0x0A,
+			REG_ATA_SELECT = REG_ATA_BEGIN + 0x0C,
+			REG_ATA_STATUS = REG_ATA_BEGIN + 0x0E,
+			REG_ATA_COMMAND = REG_ATA_STATUS,
+			REG_ATA_CONTROL = REG_ATA_BEGIN + 0x1C,
 			REG_SMAP_INTR_CLR = 0x10000128,
 			REG_SMAP_TXFIFO_CTRL = 0x10001000,
 			REG_SMAP_TXFIFO_FRAME_INC = 0x10001010,
@@ -132,7 +144,7 @@ namespace Iop
 		void ProcessEmac3StaCtrl();
 		void HandleTx();
 
-		void LogRead(uint32);
+		void LogRead(uint32, uint32);
 		void LogWrite(uint32, uint32);
 		void LogBdRead(const char*, uint32, uint32);
 		void LogBdWrite(const char*, uint32, uint32, uint32);
@@ -159,5 +171,13 @@ namespace Iop
 		UNION32_16 m_smapEmac3StaCtrl;
 		uint8 m_smapBdTx[SMAP_BD_SIZE];
 		uint8 m_smapBdRx[SMAP_BD_SIZE];
+
+		uint16 m_ataErr = 0;
+		uint16 m_ataNSector = 1;
+		uint16 m_ataSector = 1;
+		uint16 m_ataLCyl = 0;
+		uint16 m_ataHCyl = 0;
+		uint16 m_ataSelect = 0;
+		uint16 m_ataStatus = 0;
 	};
 }

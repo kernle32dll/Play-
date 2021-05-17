@@ -181,6 +181,30 @@ uint32 CSpeed::ReadRegister(uint32 address)
 		m_eepRomReadIndex++;
 	}
 	break;
+	case REG_ATA_ERROR:
+		result = m_ataErr;
+		break;
+	case REG_ATA_NSECTOR:
+		result = m_ataNSector;
+		break;
+	case REG_ATA_SECTOR:
+		result = m_ataSector;
+		break;
+	case REG_ATA_LCYL:
+		result = m_ataLCyl;
+		break;
+	case REG_ATA_HCYL:
+		result = m_ataHCyl;
+		break;
+	case REG_ATA_SELECT:
+		result = m_ataSelect;
+		break;
+	case REG_ATA_STATUS:
+		result = m_ataStatus;
+		break;
+	case REG_ATA_CONTROL:
+		result = 0x40; // Ready
+		break;
 	case REG_SMAP_RXFIFO_FRAME_CNT:
 		result = m_rxFrameCount;
 		break;
@@ -221,7 +245,7 @@ uint32 CSpeed::ReadRegister(uint32 address)
 		result = *reinterpret_cast<uint16*>(m_smapBdRx + regOffset);
 	}
 
-	LogRead(address);
+	LogRead(address, result);
 	return result;
 }
 
@@ -239,6 +263,30 @@ void CSpeed::WriteRegister(uint32 address, uint32 value)
 			//Reset reading process
 			m_eepRomReadIndex = 0;
 		}
+		break;
+	case REG_ATA_FEATURE:
+		// TODO: Probably requires masking
+		m_ataErr = value;
+	case REG_ATA_NSECTOR:
+		m_ataNSector = value;
+		break;
+	case REG_ATA_SECTOR:
+		m_ataSector = value;
+		break;
+	case REG_ATA_LCYL:
+		m_ataLCyl = value;
+		break;
+	case REG_ATA_HCYL:
+		m_ataHCyl = value;
+		break;
+	case REG_ATA_SELECT:
+		m_ataSelect = value;
+		break;
+	case REG_ATA_COMMAND:
+		m_ataStatus = value;
+		break;
+	case REG_ATA_CONTROL:
+		// NOOP
 		break;
 	case REG_SMAP_INTR_CLR:
 		m_intrStat &= ~value;
@@ -328,11 +376,11 @@ void CSpeed::CountTicks(uint32 ticks)
 	}
 }
 
-void CSpeed::LogRead(uint32 address)
+void CSpeed::LogRead(uint32 address, uint32 result)
 {
-#define LOG_GET(registerId)                                           \
-	case registerId:                                                  \
-		CLog::GetInstance().Print(LOG_NAME, "= " #registerId "\r\n"); \
+#define LOG_GET(registerId)                                                            \
+	case registerId:                                                                   \
+		CLog::GetInstance().Print(LOG_NAME, "= " #registerId " (0x%08X)\r\n", result); \
 		break;
 
 	if((address >= REG_SMAP_BD_TX_BASE) && (address < (REG_SMAP_BD_TX_BASE + SMAP_BD_SIZE)))
@@ -356,6 +404,14 @@ void CSpeed::LogRead(uint32 address)
 		LOG_GET(REG_INTR_STAT)
 		LOG_GET(REG_INTR_MASK)
 		LOG_GET(REG_PIO_DATA)
+		LOG_GET(REG_ATA_ERROR)
+		LOG_GET(REG_ATA_NSECTOR)
+		LOG_GET(REG_ATA_SECTOR)
+		LOG_GET(REG_ATA_LCYL)
+		LOG_GET(REG_ATA_HCYL)
+		LOG_GET(REG_ATA_SELECT)
+		LOG_GET(REG_ATA_STATUS)
+		LOG_GET(REG_ATA_CONTROL)
 		LOG_GET(REG_SMAP_RXFIFO_FRAME_CNT)
 		LOG_GET(REG_SMAP_RXFIFO_DATA)
 		LOG_GET(REG_SMAP_EMAC3_TXMODE0_HI)
@@ -398,6 +454,14 @@ void CSpeed::LogWrite(uint32 address, uint32 value)
 		LOG_SET(REG_INTR_MASK)
 		LOG_SET(REG_PIO_DIR)
 		LOG_SET(REG_PIO_DATA)
+		LOG_SET(REG_ATA_FEATURE)
+		LOG_SET(REG_ATA_NSECTOR)
+		LOG_SET(REG_ATA_SECTOR)
+		LOG_SET(REG_ATA_LCYL)
+		LOG_SET(REG_ATA_HCYL)
+		LOG_SET(REG_ATA_SELECT)
+		LOG_SET(REG_ATA_COMMAND)
+		LOG_SET(REG_ATA_CONTROL)
 		LOG_SET(REG_SMAP_INTR_CLR)
 		LOG_SET(REG_SMAP_TXFIFO_FRAME_INC)
 		LOG_SET(REG_SMAP_RXFIFO_RD_PTR)
