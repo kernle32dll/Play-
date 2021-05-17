@@ -74,7 +74,9 @@ void CLoadcore::Invoke(CMIPS& context, unsigned int functionId)
 	case 3:
 		context.m_State.nGPR[CMIPS::V0].nD0 = static_cast<int32>(GetLibraryEntryTable());
 		break;
+	case 4:
 	case 5:
+		//FlushICache
 		//FlushDCache
 		break;
 	case 6:
