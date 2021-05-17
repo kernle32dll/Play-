@@ -19,10 +19,17 @@ namespace Iop
 	private:
 		enum
 		{
+			// TODO: Find out these - they are used by OPL
+			// 0x1F801460
+			// 0x1F801462
+			// 0x1F801464
+			REG_POWER = 0x1F80146C,
 			REG_REV = 0x1F80146E,
 		};
 
-		void LogRead(uint32);
+		void LogRead(uint32, uint32);
 		void LogWrite(uint32, uint32);
+
+		uint32 m_Power;
 	};
 }
