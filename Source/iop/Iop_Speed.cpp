@@ -151,6 +151,13 @@ uint32 CSpeed::ReadRegister(uint32 address)
 	case REG_REV3:
 		result = SPEED_CAPS_SMAP;
 		break;
+	case REG_REV8:
+		// ps2atad checks for this
+		result = 0x02;
+		break;
+	case REG_IS_OFFICIAL:
+		result = 0x1;
+		break;
 	case REG_INTR_STAT:
 		result = m_intrStat;
 		break;
@@ -344,6 +351,8 @@ void CSpeed::LogRead(uint32 address)
 	{
 		LOG_GET(REG_REV1)
 		LOG_GET(REG_REV3)
+		LOG_GET(REG_REV8)
+		LOG_GET(REG_IS_OFFICIAL)
 		LOG_GET(REG_INTR_STAT)
 		LOG_GET(REG_INTR_MASK)
 		LOG_GET(REG_PIO_DATA)

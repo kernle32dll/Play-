@@ -72,6 +72,8 @@ namespace Iop
 		{
 			REG_REV1 = 0x10000002,
 			REG_REV3 = 0x10000004,
+			REG_REV8 = 0x1000000E,
+			REG_IS_OFFICIAL = 0x10000020, // Undocumented register, 0x1 for official adaptors
 			REG_DMA_CTRL = 0x10000024,
 			REG_INTR_STAT = 0x10000028,
 			REG_INTR_MASK = 0x1000002A,
