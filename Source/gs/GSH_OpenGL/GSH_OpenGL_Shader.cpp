@@ -381,14 +381,14 @@ Framework::OpenGl::CShader CGSH_OpenGL::GenerateFragmentShader(const SHADERCAPS&
 
 	// ----------------------
 
+	//For proper alpha blending, alpha has to be multiplied by 2 (0x80 -> 1.0)
+#ifdef USE_DUALSOURCE_BLENDING
 	if(useFramebufferFetch)
 	{
 		shaderBuilder << "	if(outputAlpha) {" << std::endl
 		              << "	";
 	}
 
-	//For proper alpha blending, alpha has to be multiplied by 2 (0x80 -> 1.0)
-#ifdef USE_DUALSOURCE_BLENDING
 	shaderBuilder << "	fragColor.a = textureColor.a;" << std::endl;
 	if(useFramebufferFetch)
 	{
@@ -396,15 +396,28 @@ Framework::OpenGl::CShader CGSH_OpenGL::GenerateFragmentShader(const SHADERCAPS&
 		shaderBuilder << "	";
 	}
 	shaderBuilder << "	blendColor.a = clamp(textureColor.a * 2.0, 0.0, 1.0);" << std::endl;
+
+	if(useFramebufferFetch)
+	{
+		shaderBuilder << "	} else {" << std::endl
+		              << "	    blendColor.a = 0.0;" << std::endl
+		              << "	}" << std::endl;
+	}
 #else
+	if(useFramebufferFetch)
+	{
+		shaderBuilder << "	if(outputAlpha) {" << std::endl
+		              << "	";
+	}
+
 	//This has the side effect of not writing a proper value in the framebuffer (should write alpha "as is")
 	shaderBuilder << "	fragColor.a = clamp(textureColor.a * 2.0, 0.0, 1.0);" << std::endl;
-#endif
 
 	if(useFramebufferFetch)
 	{
 		shaderBuilder << "	}" << std::endl;
 	}
+#endif
 
 	if(caps.colorOutputWhite)
 	{
