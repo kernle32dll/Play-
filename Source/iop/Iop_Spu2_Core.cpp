@@ -147,6 +147,18 @@ uint32 CCore::ReadRegisterCore(unsigned int channelId, uint32 address, uint32 va
 			result |= 0x80;
 		}
 		break;
+	case A_KON_HI:
+		result = GetAddressHi(GetChannelBitState(CSpuBase::KEY_ON));
+		break;
+	case A_KON_LO:
+		result = GetAddressLo(GetChannelBitState(CSpuBase::KEY_ON));
+		break;
+	case A_KOFF_HI:
+		result = GetAddressHi(GetChannelBitState(CSpuBase::STOPPED));
+		break;
+	case A_KOFF_LO:
+		result = GetAddressLo(GetChannelBitState(CSpuBase::STOPPED));
+		break;
 	case S_ENDX_HI:
 		result = m_spuBase.GetEndFlags().h0;
 		break;
@@ -158,6 +170,12 @@ uint32 CCore::ReadRegisterCore(unsigned int channelId, uint32 address, uint32 va
 		break;
 	case A_TS_MODE:
 		result = m_spuBase.GetTransferMode();
+		break;
+	case A_IRQA_HI:
+		result = GetAddressHi(m_spuBase.GetIrqAddress());
+		break;
+	case A_IRQA_LO:
+		result = GetAddressLo(m_spuBase.GetIrqAddress());
 		break;
 	case A_TSA_HI:
 		result = GetAddressHi(m_spuBase.GetTransferAddress());
@@ -173,6 +191,20 @@ uint32 CCore::ReadRegisterCore(unsigned int channelId, uint32 address, uint32 va
 		break;
 	}
 	LogRead(address, result);
+	return result;
+}
+
+uint32 CCore::GetChannelBitState(CSpuBase::CHANNEL_STATUS status)
+{
+	uint32 result = 0;
+	for(unsigned int i = 0; i < MAX_CHANNEL; i++)
+	{
+		CSpuBase::CHANNEL& channel = m_spuBase.GetChannel(i);
+		if(channel.status == status)
+		{
+			result &= (1 << i);
+		}
+	}
 	return result;
 }
 
@@ -411,8 +443,14 @@ void CCore::LogRead(uint32 address, uint32 value)
 		LOG_GET(S_VMIXR_LO)
 		LOG_GET(S_VMIXER_HI)
 		LOG_GET(S_VMIXER_LO)
+		LOG_GET(A_KON_HI)
+		LOG_GET(A_KON_LO)
+		LOG_GET(A_KOFF_HI)
+		LOG_GET(A_KOFF_LO)
 		LOG_GET(S_ENDX_HI)
 		LOG_GET(S_ENDX_LO)
+		LOG_GET(A_IRQA_HI)
+		LOG_GET(A_IRQA_LO)
 		LOG_GET(A_TSA_HI)
 		LOG_GET(A_TSA_LO)
 		LOG_GET(A_TS_MODE)

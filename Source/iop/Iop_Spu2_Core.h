@@ -119,6 +119,8 @@ namespace Iop
 			uint32 SetAddressLo(uint32, uint16);
 			uint32 SetAddressHi(uint32, uint16);
 
+			uint32 GetChannelBitState(CSpuBase::CHANNEL_STATUS);
+
 			REGISTER_DISPATCH_INFO m_readDispatch;
 			REGISTER_DISPATCH_INFO m_writeDispatch;
 			unsigned int m_coreId;
