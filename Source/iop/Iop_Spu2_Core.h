@@ -69,7 +69,7 @@ namespace Iop
 				VA_NAX_LO = 0x1F9001CA,
 				R_REG_BASE = 0x1F9002E0,
 				RVB_A_REG_BASE = 0x1F9002E4, //Reverb Base
-				RVB_A_REG_END = 0x1F900338,
+				RVB_A_REG_END = 0x1F90033A,
 				A_ESA_HI = 0x1F9002E0,
 				A_ESA_LO = 0x1F9002E2,
 				A_EEA_HI = 0x1F90033C,
@@ -84,7 +84,7 @@ namespace Iop
 				P_BVOLL = 0x1F90076C, //Audio input volume
 				P_BVOLR = 0x1F90076E,
 				RVB_C_REG_BASE = 0x1F900774,
-				RVB_C_REG_END = 0x1F900788,
+				RVB_C_REG_END = 0x1F900786,
 			};
 
 		private:
