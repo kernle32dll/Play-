@@ -1802,6 +1802,7 @@ void CIopBios::CountTicks(uint32 ticks)
 	CurrentTime() += ticks;
 #ifdef _IOP_EMULATE_MODULES
 	m_mcserv->CountTicks(ticks, m_sifMan.get());
+	m_sifMan->CountTicks(ticks);
 #endif
 }
 

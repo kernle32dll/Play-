@@ -144,6 +144,10 @@ uint32 CSifMan::SifSetDmaCallback(CMIPS& context, uint32 structAddr, uint32 coun
 	return SifSetDma(structAddr, count);
 }
 
+void CSifMan::CountTicks(uint32)
+{
+}
+
 void CSifMan::SifSetDChain(CMIPS& context)
 {
 	context.m_pMemoryMap->SetWord(CDmac::CH10_BASE + Dmac::CChannel::REG_CHCR, 0x41000300);

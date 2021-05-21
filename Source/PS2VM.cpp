@@ -421,7 +421,7 @@ void CPS2VM::ResetVM()
 		auto iopOs = dynamic_cast<CIopBios*>(m_iop->m_bios.get());
 		assert(iopOs);
 
-		iopOs->Reset(std::make_shared<Iop::CSifManPs2>(m_ee->m_sif, m_ee->m_ram, m_iop->m_ram));
+		iopOs->Reset(std::make_shared<Iop::CSifManPs2>(*iopOs, m_ee->m_sif, m_ee->m_ram, m_iop->m_ram));
 
 		iopOs->GetIoman()->RegisterDevice("rom0", std::make_shared<Iop::Ioman::CPreferenceDirectoryDevice>(PREF_PS2_ROM0_DIRECTORY));
 		iopOs->GetIoman()->RegisterDevice("host", std::make_shared<Iop::Ioman::CPreferenceDirectoryDevice>(PREF_PS2_HOST_DIRECTORY));
