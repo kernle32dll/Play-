@@ -872,6 +872,7 @@ void CDMAC::SetRegister(uint32 nAddress, uint32 nData)
 		break;
 
 	case D_STAT + 0x0:
+	case D_STAT_ALT + 0x0:
 	{
 		uint32 nStat = nData & 0x0000FFFF;
 		uint32 nMask = nData & 0xFFFF0000;
@@ -888,6 +889,9 @@ void CDMAC::SetRegister(uint32 nAddress, uint32 nData)
 	case D_STAT + 0x4:
 	case D_STAT + 0x8:
 	case D_STAT + 0xC:
+	case D_STAT_ALT + 0x4:
+	case D_STAT_ALT + 0x8:
+	case D_STAT_ALT + 0xC:
 		break;
 
 	case D_PCR + 0x0:
