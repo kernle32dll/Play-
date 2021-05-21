@@ -432,56 +432,67 @@ void CCore::LogRead(uint32 address, uint32 value)
 void CCore::LogWrite(uint32 address, uint32 value)
 {
 	auto logName = m_logName.c_str();
+
+	if(address >= RVB_A_REG_BASE && address < RVB_A_REG_END)
+	{
+		CLog::GetInstance().Print(logName, "REVERB_ADDRESS[0x%04X] = 0x%04X\r\n", address - RVB_A_REG_BASE, value);
+	}
+	else if(address >= RVB_C_REG_BASE && address < RVB_C_REG_END)
+	{
+		CLog::GetInstance().Print(logName, "REVERB_COEFFICIENT[0x%04X] = 0x%04X\r\n", address - RVB_C_REG_BASE, value);
+	}
+	else
+	{
 #define LOG_SET(registerId)                                                     \
 	case registerId:                                                            \
 		CLog::GetInstance().Print(logName, #registerId " = 0x%04X\r\n", value); \
 		break;
 
-	switch(address)
-	{
-		LOG_SET(S_PMON_HI)
-		LOG_SET(S_PMON_LO)
-		LOG_SET(S_NON_HI)
-		LOG_SET(S_NON_LO)
-		LOG_SET(S_VMIXL_HI)
-		LOG_SET(S_VMIXL_LO)
-		LOG_SET(S_VMIXEL_HI)
-		LOG_SET(S_VMIXEL_LO)
-		LOG_SET(S_VMIXR_HI)
-		LOG_SET(S_VMIXR_LO)
-		LOG_SET(S_VMIXER_HI)
-		LOG_SET(S_VMIXER_LO)
-		LOG_SET(P_MMIX)
-		LOG_SET(CORE_ATTR)
-		LOG_SET(A_KON_HI)
-		LOG_SET(A_KON_LO)
-		LOG_SET(A_KOFF_HI)
-		LOG_SET(A_KOFF_LO)
-		LOG_SET(S_ENDX_HI)
-		LOG_SET(S_ENDX_LO)
-		LOG_SET(A_IRQA_HI)
-		LOG_SET(A_IRQA_LO)
-		LOG_SET(A_TSA_HI)
-		LOG_SET(A_TSA_LO)
-		LOG_SET(A_STD)
-		LOG_SET(A_TS_MODE)
-		LOG_SET(A_ESA_HI)
-		LOG_SET(A_ESA_LO)
-		LOG_SET(A_EEA_HI)
-		LOG_SET(A_EEA_LO)
-		LOG_SET(P_MVOLL)
-		LOG_SET(P_MVOLR)
-		LOG_SET(P_EVOLL)
-		LOG_SET(P_EVOLR)
-		LOG_SET(P_BVOLL)
-		LOG_SET(P_BVOLR)
+		switch(address)
+		{
+			LOG_SET(S_PMON_HI)
+			LOG_SET(S_PMON_LO)
+			LOG_SET(S_NON_HI)
+			LOG_SET(S_NON_LO)
+			LOG_SET(S_VMIXL_HI)
+			LOG_SET(S_VMIXL_LO)
+			LOG_SET(S_VMIXEL_HI)
+			LOG_SET(S_VMIXEL_LO)
+			LOG_SET(S_VMIXR_HI)
+			LOG_SET(S_VMIXR_LO)
+			LOG_SET(S_VMIXER_HI)
+			LOG_SET(S_VMIXER_LO)
+			LOG_SET(P_MMIX)
+			LOG_SET(CORE_ATTR)
+			LOG_SET(A_KON_HI)
+			LOG_SET(A_KON_LO)
+			LOG_SET(A_KOFF_HI)
+			LOG_SET(A_KOFF_LO)
+			LOG_SET(S_ENDX_HI)
+			LOG_SET(S_ENDX_LO)
+			LOG_SET(A_IRQA_HI)
+			LOG_SET(A_IRQA_LO)
+			LOG_SET(A_TSA_HI)
+			LOG_SET(A_TSA_LO)
+			LOG_SET(A_STD)
+			LOG_SET(A_TS_MODE)
+			LOG_SET(A_ESA_HI)
+			LOG_SET(A_ESA_LO)
+			LOG_SET(A_EEA_HI)
+			LOG_SET(A_EEA_LO)
+			LOG_SET(P_MVOLL)
+			LOG_SET(P_MVOLR)
+			LOG_SET(P_EVOLL)
+			LOG_SET(P_EVOLR)
+			LOG_SET(P_BVOLL)
+			LOG_SET(P_BVOLR)
 
-	default:
-		CLog::GetInstance().Warn(logName, "Write 0x%04X to an unknown register 0x%04X.\r\n", value, address);
-		break;
-	}
-
+		default:
+			CLog::GetInstance().Warn(logName, "Write 0x%04X to an unknown register 0x%04X.\r\n", value, address);
+			break;
+		}
 #undef LOG_SET
+	}
 }
 
 void CCore::LogChannelRead(unsigned int channelId, uint32 address, uint32 value)
