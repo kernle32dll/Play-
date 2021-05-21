@@ -175,7 +175,7 @@ uint32 CCore::ReadRegisterCore(unsigned int channelId, uint32 address, uint32 va
 
 uint32 CCore::WriteRegisterCore(unsigned int channelId, uint32 address, uint32 value)
 {
-	if(address >= RVB_A_REG_BASE && address < RVB_A_REG_END)
+	if(address >= RVB_A_REG_BASE && address <= RVB_A_REG_END)
 	{
 		//Address reverb register
 		unsigned int regIndex = (address - RVB_A_REG_BASE) / 4;
@@ -192,7 +192,7 @@ uint32 CCore::WriteRegisterCore(unsigned int channelId, uint32 address, uint32 v
 		}
 		m_spuBase.SetReverbParam(reverbParamId, value);
 	}
-	else if(address >= RVB_C_REG_BASE && address < RVB_C_REG_END)
+	else if(address >= RVB_C_REG_BASE && address <= RVB_C_REG_END)
 	{
 		//Coefficient reverb register
 		unsigned int regIndex = (address - RVB_C_REG_BASE) / 2;
@@ -422,11 +422,11 @@ void CCore::LogWrite(uint32 address, uint32 value)
 {
 	auto logName = m_logName.c_str();
 
-	if(address >= RVB_A_REG_BASE && address < RVB_A_REG_END)
+	if(address >= RVB_A_REG_BASE && address <= RVB_A_REG_END)
 	{
 		CLog::GetInstance().Print(logName, "REVERB_ADDRESS[0x%04X] = 0x%04X\r\n", address - RVB_A_REG_BASE, value);
 	}
-	else if(address >= RVB_C_REG_BASE && address < RVB_C_REG_END)
+	else if(address >= RVB_C_REG_BASE && address <= RVB_C_REG_END)
 	{
 		CLog::GetInstance().Print(logName, "REVERB_COEFFICIENT[0x%04X] = 0x%04X\r\n", address - RVB_C_REG_BASE, value);
 	}
