@@ -35,6 +35,7 @@ namespace Iop
 		virtual void SetCustomCommandHandler(const CustomCommandHandler&) = 0;
 
 		virtual uint32 SifSetDma(uint32, uint32);
+		virtual void SifSetDChain(CMIPS&);
 
 	protected:
 		virtual uint32 SifDmaStat(uint32);
