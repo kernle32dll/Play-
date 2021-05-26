@@ -17,6 +17,8 @@ namespace Iop
 			CHANNEL_SPU0 = 4,
 			CHANNEL_SPU1 = 7,
 			CHANNEL_DEV9 = 8,
+			CHANNEL_SIF0 = 9,
+			CHANNEL_SIF1 = 10,
 			CHANNEL_SIO2in = 11,
 			CHANNEL_SIO2out = 12,
 			MAX_CHANNEL = 16,
@@ -33,6 +35,7 @@ namespace Iop
 			CH6_BASE = 0x1F8010E0,
 			CH7_BASE = 0x1F801500,
 			CH8_BASE = 0x1F801510,
+			CH9_BASE = 0x1F801520,
 			CH10_BASE = 0x1F801530,
 			CH11_BASE = 0x1F801540, //Unsure about that
 			CH12_BASE = 0x1F801550, //Unsure about that
@@ -81,6 +84,8 @@ namespace Iop
 		Dmac::CChannel m_channelSpu0;
 		Dmac::CChannel m_channelSpu1;
 		Dmac::CChannel m_channelDev9;
+		Dmac::CChannel m_channelSif0;
+		Dmac::CChannel m_channelSif1;
 		Dmac::CChannel m_channelSio2In;
 		Dmac::CChannel m_channelSio2Out;
 		Dmac::CChannel* m_channel[MAX_CHANNEL];
