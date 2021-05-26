@@ -22,6 +22,8 @@ CDmac::CDmac(uint8* ram, CIntc& intc)
     , m_channelSpu0(CH4_BASE, CHANNEL_SPU0, Iop::CIntc::LINE_DMA_SPU0, *this)
     , m_channelSpu1(CH7_BASE, CHANNEL_SPU1, Iop::CIntc::LINE_DMA_SPU1, *this)
     , m_channelDev9(CH8_BASE, CHANNEL_DEV9, Iop::CIntc::LINE_DMA_DEV9, *this)
+    , m_channelSif0(CH9_BASE, CHANNEL_SIF0, Iop::CIntc::LINE_DMA_SIF0, *this)
+    , m_channelSif1(CH10_BASE, CHANNEL_SIF1, Iop::CIntc::LINE_DMA_SIF1, *this)
     , m_channelSio2In(CH11_BASE, CHANNEL_SIO2in, Iop::CIntc::LINE_DMA_SIO2in, *this)
     , m_channelSio2Out(CH12_BASE, CHANNEL_SIO2out, Iop::CIntc::LINE_DMA_SIO2out, *this)
 {
@@ -29,6 +31,8 @@ CDmac::CDmac(uint8* ram, CIntc& intc)
 	m_channel[CHANNEL_SPU0] = &m_channelSpu0;
 	m_channel[CHANNEL_SPU1] = &m_channelSpu1;
 	m_channel[CHANNEL_DEV9] = &m_channelDev9;
+	m_channel[CHANNEL_SIF0] = &m_channelSif0;
+	m_channel[CHANNEL_SIF1] = &m_channelSif1;
 	//Not enabled, only used for testing purposes
 	//m_channel[CHANNEL_SIO2in] = &m_channelSio2In;
 	//m_channel[CHANNEL_SIO2out] = &m_channelSio2Out;
