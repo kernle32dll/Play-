@@ -1,11 +1,13 @@
 #include "Iop_SifMan.h"
 #include "Iop_Sysmem.h"
+#include "Iop_Dmac.h"
 #include "../MIPSAssembler.h"
 #include "../Log.h"
 
 #define LOG_NAME ("iop_sifman")
 
 #define FUNCTION_SIFINIT "SifInit"
+#define FUNCTION_SIFSETDCHAIN "SifSetDChain"
 #define FUNCTION_SIFSETDMA "SifSetDma"
 #define FUNCTION_SIFDMASTAT "SifDmaStat"
 #define FUNCTION_SIFCHECKINIT "SifCheckInit"
@@ -30,6 +32,9 @@ std::string CSifMan::GetFunctionName(unsigned int functionId) const
 	case 5:
 		return FUNCTION_SIFINIT;
 		break;
+	case 6:
+		return FUNCTION_SIFSETDCHAIN;
+		break;
 	case 7:
 		return FUNCTION_SIFSETDMA;
 		break;
@@ -50,6 +55,9 @@ void CSifMan::Invoke(CMIPS& context, unsigned int functionId)
 {
 	switch(functionId)
 	{
+	case 6:
+		SifSetDChain(context);
+		break;
 	case 7:
 		context.m_State.nGPR[CMIPS::V0].nD0 = static_cast<int32>(SifSetDma(
 		    context.m_State.nGPR[CMIPS::A0].nV0,
@@ -135,4 +143,10 @@ uint32 CSifMan::SifSetDmaCallback(CMIPS& context, uint32 structAddr, uint32 coun
 	context.m_State.nGPR[CMIPS::A1].nV0 = callbackPtr;
 
 	return SifSetDma(structAddr, count);
+}
+
+void CSifMan::SifSetDChain(CMIPS& context)
+{
+	context.m_pMemoryMap->SetWord(CDmac::CH10_BASE + Dmac::CChannel::REG_CHCR, 0x41000300);
+	context.m_pMemoryMap->SetWord(CDmac::CH10_BASE + Dmac::CChannel::REG_BCR, 32);
 }
