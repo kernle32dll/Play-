@@ -11,6 +11,7 @@ using namespace Iop;
 #define FUNCTION_LOADMODULEBUFFERADDRESS "LoadModuleBufferAddress"
 #define FUNCTION_LOADMODULEBUFFER "LoadModuleBuffer"
 #define FUNCTION_GETMODULEIDLIST "GetModuleIdList"
+#define FUNCTION_GETMODULEIDLISTBYNAME "GetModuleIdListByName"
 #define FUNCTION_REFERMODULESTATUS "ReferModuleStatus"
 #define FUNCTION_LOADMODULEWITHOPTION "LoadModuleWithOption"
 #define FUNCTION_STOPMODULE "StopModule"
@@ -60,6 +61,9 @@ std::string CModload::GetFunctionName(unsigned int functionId) const
 		break;
 	case 16:
 		return FUNCTION_GETMODULEIDLIST;
+		break;
+	case 18:
+		return FUNCTION_GETMODULEIDLISTBYNAME;
 		break;
 	case 17:
 		return FUNCTION_REFERMODULESTATUS;
@@ -119,6 +123,13 @@ void CModload::Invoke(CMIPS& context, unsigned int functionId)
 		    context.m_State.nGPR[CMIPS::A0].nV0,
 		    context.m_State.nGPR[CMIPS::A1].nV0,
 		    context.m_State.nGPR[CMIPS::A2].nV0));
+		break;
+	case 18:
+		context.m_State.nGPR[CMIPS::V0].nD0 = static_cast<int32>(GetModuleIdListByName(
+		    context.m_State.nGPR[CMIPS::A0].nV0,
+		    context.m_State.nGPR[CMIPS::A1].nV0,
+		    context.m_State.nGPR[CMIPS::A2].nV0,
+		    context.m_State.nGPR[CMIPS::A3].nV0));
 		break;
 	case 17:
 		context.m_State.nGPR[CMIPS::V0].nD0 = ReferModuleStatus(
@@ -216,6 +227,33 @@ uint32 CModload::GetModuleIdList(uint32 readBufPtr, uint32 readBufSize, uint32 m
 		(*moduleCount) = 0;
 	}
 	CLog::GetInstance().Warn(LOG_NAME, "Using " FUNCTION_GETMODULEIDLIST ", but it is not implemented.\r\n");
+	return 0;
+}
+
+uint32 CModload::GetModuleIdListByName(uint32 moduleNamePtr, uint32 readBufPtr, uint32 readBufSize, uint32 moduleCountPtr)
+{
+	// TODO: This is a simplified version, which does not really return a list,
+	// but checks if a specific module exists, or not.
+
+	CLog::GetInstance().Print(LOG_NAME, FUNCTION_GETMODULEIDLISTBYNAME "(moduleNamePtr = %s, "
+	                                                                   "readBufPtr = 0x%08X, "
+	                                                                   "readBufSize = 0x%08X, "
+	                                                                   "moduleCountPtr = 0x%08X);\r\n",
+	                          PrintStringParameter(m_ram, moduleNamePtr).c_str(), readBufPtr, readBufSize, moduleCountPtr);
+	auto moduleName = reinterpret_cast<const char*>(m_ram + moduleNamePtr);
+
+	uint32 id = m_bios.SearchModuleByName(moduleName);
+
+	// Record the id, if we have a list to store it in
+	if(readBufSize >= 1)
+	{
+		auto idList = reinterpret_cast<uint32*>(m_ram + readBufPtr);
+		idList[0] = id;
+	}
+
+	auto moduleCount = reinterpret_cast<uint32*>(m_ram + moduleCountPtr);
+	(*moduleCount) = (id == -1) ? 0 : 1;
+
 	return 0;
 }
 
