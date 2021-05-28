@@ -934,7 +934,9 @@ bool CIopBios::TryGetImageVersionFromPath(const std::string& imagePath, unsigned
 
 	for(const auto imageFilePattern : g_imageFilePatterns)
 	{
-		auto imageFileName = strstr(imagePath.c_str(), imageFilePattern.start);
+		auto upperCaseImagePath = imagePath;
+		std::transform(upperCaseImagePath.begin(), upperCaseImagePath.end(), upperCaseImagePath.begin(), ::toupper);
+		auto imageFileName = strstr(upperCaseImagePath.c_str(), imageFilePattern.start);
 		if(imageFileName != nullptr)
 		{
 			unsigned int imageVersion = 0;
