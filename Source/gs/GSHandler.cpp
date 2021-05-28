@@ -401,6 +401,8 @@ uint32 CGSHandler::ReadPrivRegister(uint32 nAddress)
 	uint32 nData = 0;
 	switch(nAddress & ~0x0F)
 	{
+	case GS_PMODE:
+		R_REG(nAddress, nData, m_nPMODE);
 	case GS_CSR:
 	case GS_CSR_ALT:
 		//Force CSR to have the H-Blank bit set.
