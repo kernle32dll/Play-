@@ -218,6 +218,7 @@ public:
 	int32 StartThread(uint32, uint32);
 	int32 StartThreadArgs(uint32, uint32, uint32);
 	void ExitThread();
+	void ExitDeleteThread();
 	uint32 TerminateThread(uint32);
 	int32 DelayThread(uint32);
 	void DelayThreadTicks(uint32);

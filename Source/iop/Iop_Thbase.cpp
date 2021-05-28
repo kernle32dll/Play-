@@ -11,6 +11,7 @@ using namespace Iop;
 #define FUNCTION_STARTTHREADARGS "StartThreadArgs"
 #define FUNCTION_DELETETHREAD "DeleteThread"
 #define FUNCTION_EXITTHREAD "ExitThread"
+#define FUNCTION_EXITDELETETHREAD "ExitDeleteThread"
 #define FUNCTION_TERMINATETHREAD "TerminateThread"
 #define FUNCTION_CHANGETHREADPRIORITY "ChangeThreadPriority"
 #define FUNCTION_ROTATETHREADREADYQUEUE "RotateThreadReadyQueue"
@@ -63,6 +64,9 @@ std::string CThbase::GetFunctionName(unsigned int functionId) const
 		break;
 	case 8:
 		return FUNCTION_EXITTHREAD;
+		break;
+	case 9:
+		return FUNCTION_EXITDELETETHREAD;
 		break;
 	case 10:
 		return FUNCTION_TERMINATETHREAD;
@@ -161,6 +165,9 @@ void CThbase::Invoke(CMIPS& context, unsigned int functionId)
 		break;
 	case 8:
 		context.m_State.nGPR[CMIPS::V0].nD0 = static_cast<int32>(ExitThread());
+		break;
+	case 9:
+		context.m_State.nGPR[CMIPS::V0].nD0 = static_cast<int32>(ExitDeleteThread());
 		break;
 	case 10:
 		context.m_State.nGPR[CMIPS::V0].nD0 = static_cast<int32>(TerminateThread(
@@ -287,6 +294,12 @@ int32 CThbase::StartThreadArgs(uint32 threadId, uint32 args, uint32 argpPtr)
 uint32 CThbase::ExitThread()
 {
 	m_bios.ExitThread();
+	return 0;
+}
+
+uint32 CThbase::ExitDeleteThread()
+{
+	m_bios.ExitDeleteThread();
 	return 0;
 }
 

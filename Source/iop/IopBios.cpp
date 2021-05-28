@@ -1192,6 +1192,22 @@ void CIopBios::ExitThread()
 	m_rescheduleNeeded = true;
 }
 
+void CIopBios::ExitDeleteThread()
+{
+#ifdef _DEBUG
+	CLog::GetInstance().Print(LOGNAME, "%i: ExitDeleteThread();\r\n", m_currentThreadId.Get());
+#endif
+	THREAD* thread = GetThread(m_currentThreadId);
+	thread->status = THREAD_STATUS_DORMANT;
+
+	UnlinkThread(thread->id);
+	m_sysmem->FreeMemory(thread->stackBase);
+	m_threads.Free(thread->id);
+
+	m_currentThreadId = -1;
+	m_rescheduleNeeded = true;
+}
+
 uint32 CIopBios::TerminateThread(uint32 threadId)
 {
 #ifdef _DEBUG
