@@ -1,4 +1,5 @@
 #include "Iop_LibSd.h"
+#include "Iop_SifMan.h"
 #include "../Log.h"
 #include "string_format.h"
 
@@ -26,6 +27,11 @@ using namespace Iop;
 #define FUNCTION_SETSPU2INTRHANDLER "SetSpu2IntrHandler"
 
 #define LOG_NAME "iop_libsd"
+
+CLibSd::CLibSd(CSifMan& sifMan)
+{
+	sifMan.RegisterModule(MODULE_ID, this);
+}
 
 std::string CLibSd::GetId() const
 {
@@ -93,8 +99,15 @@ std::string CLibSd::GetFunctionName(unsigned int functionId) const
 	}
 }
 
-void CLibSd::Invoke(CMIPS&, unsigned int)
+void CLibSd::Invoke(CMIPS& context, unsigned int functionId)
 {
+	CLog::GetInstance().Warn(LOG_NAME, "Unknown module method invoked (%d).\r\n", functionId);
+}
+
+bool CLibSd::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, uint32 retSize, uint8* ram)
+{
+	CLog::GetInstance().Warn(LOG_NAME, "Unknown RPC method invoked (0x%08X).\r\n", method);
+	return true;
 }
 
 static std::string DecodeAddress(uint16 addressId)
