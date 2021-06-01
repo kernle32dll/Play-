@@ -45,6 +45,7 @@
 #define STATE_PACKET_CALL_RECVMODE ("Packet_Call_RecvMode")
 #define STATE_PACKET_CALL_SERVERDATAADDR ("Packet_Call_ServerDataAddr")
 
+#define STATE_PENDING_PACKET_REQUEST_END_DELAY ("Packet_Request_Delay")
 #define STATE_PACKET_REQUEST_END_RECORDID ("Packet_Request_End_RecordId")
 #define STATE_PACKET_REQUEST_END_PACKETADDR ("Packet_Request_End_PacketAddr")
 #define STATE_PACKET_REQUEST_END_RPCID ("Packet_Request_End_RpcId")
@@ -325,7 +326,7 @@ void CSIF::SaveBindReplies(Framework::CZipArchiveWriter& archive)
 		auto replyId = string_format("%08x", bindReplyIterator.first);
 		CStructFile replyStruct;
 		{
-			SaveState_RequestEnd(replyStruct, bindReply);
+			SaveState_PendingRequestEnd(replyStruct, bindReply);
 		}
 		bindRepliesFile->InsertStruct(replyId.c_str(), replyStruct);
 	}
@@ -371,8 +372,8 @@ CSIF::BindReplyMap CSIF::LoadBindReplies(Framework::CZipArchiveReader& archive)
 	{
 		const auto& structFile(structFilePair.second);
 		uint32 replyId = lexical_cast_hex<std::string>(structFilePair.first);
-		SIFRPCREQUESTEND bindReply;
-		LoadState_RequestEnd(structFile, bindReply);
+		SIFRPCPENDINGREQUESTEND bindReply;
+		LoadState_PendingRequestEnd(structFile, bindReply);
 		bindReplies[replyId] = bindReply;
 	}
 	return bindReplies;
@@ -439,6 +440,12 @@ void CSIF::SaveState_RequestEnd(CStructFile& file, const SIFRPCREQUESTEND& reque
 	file.SetRegister32(STATE_PACKET_REQUEST_END_CLIENTBUFFER, requestEnd.cbuffer);
 }
 
+void CSIF::SaveState_PendingRequestEnd(CStructFile& file, const SIFRPCPENDINGREQUESTEND& pendingRequestEnd)
+{
+	SaveState_RequestEnd(file, pendingRequestEnd.requestEnd);
+	file.SetRegister32(STATE_PENDING_PACKET_REQUEST_END_DELAY, pendingRequestEnd.pendingReplyDelay);
+}
+
 void CSIF::LoadState_RequestEnd(const CStructFile& file, SIFRPCREQUESTEND& requestEnd)
 {
 	LoadState_Header("requestEnd", file, requestEnd.header);
@@ -450,6 +457,40 @@ void CSIF::LoadState_RequestEnd(const CStructFile& file, SIFRPCREQUESTEND& reque
 	requestEnd.serverDataAddr = file.GetRegister32(STATE_PACKET_REQUEST_END_SERVERDATAADDR);
 	requestEnd.buffer = file.GetRegister32(STATE_PACKET_REQUEST_END_BUFFER);
 	requestEnd.cbuffer = file.GetRegister32(STATE_PACKET_REQUEST_END_CLIENTBUFFER);
+}
+
+void CSIF::LoadState_PendingRequestEnd(const CStructFile& file, SIFRPCPENDINGREQUESTEND& pendingRequestEnd)
+{
+	LoadState_RequestEnd(file, pendingRequestEnd.requestEnd);
+	pendingRequestEnd.pendingReplyDelay = file.GetRegister32(STATE_PENDING_PACKET_REQUEST_END_DELAY);
+}
+
+void CSIF::CountTicks(int ticks)
+{
+	// Look at the pending binding replies, and decrement the delay counter.
+	// This is used to catch pending replies, for which modules are never loaded.
+	// This is done by various Neversoft games (Gun, Guitar Hero III, Tony Hawk's Underground 2)
+	std::vector<uint32> pendingDeletion;
+	for(auto& bindReplyIterator : m_bindReplies)
+	{
+		auto& bindReplyWithTicks = bindReplyIterator.second;
+		bindReplyWithTicks.pendingReplyDelay -= std::min<uint32>(bindReplyWithTicks.pendingReplyDelay, ticks);
+
+		if(bindReplyWithTicks.pendingReplyDelay == 0)
+		{
+			// Binding failed, as module was not loaded in time
+			bindReplyWithTicks.requestEnd.serverDataAddr = 0;
+			SendPacket(&bindReplyWithTicks.requestEnd, sizeof(SIFRPCREQUESTEND));
+
+			// Keep track of pending deletions, to not disturb the iterator
+			pendingDeletion.push_back(bindReplyIterator.first);
+		}
+	}
+
+	for(const uint32 deleteId : pendingDeletion)
+	{
+		m_bindReplies.erase(deleteId);
+	}
 }
 
 /////////////////////////////////////////////////////////
@@ -526,7 +567,10 @@ void CSIF::Cmd_Bind(const SIFCMDHEADER* hdr)
 	else
 	{
 		assert(m_bindReplies.find(bind->serverId) == m_bindReplies.end());
-		m_bindReplies[bind->serverId] = rend;
+		auto lateBindReply = SIFRPCPENDINGREQUESTEND();
+		lateBindReply.requestEnd = rend;
+		lateBindReply.pendingReplyDelay = 1000;
+		m_bindReplies[bind->serverId] = lateBindReply;
 	}
 }
 

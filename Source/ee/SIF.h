@@ -46,6 +46,8 @@ public:
 	void LoadState(Framework::CZipArchiveReader&);
 	void SaveState(Framework::CZipArchiveWriter&);
 
+	void CountTicks(int ticks);
+
 private:
 	struct CALLREQUESTINFO
 	{
@@ -56,7 +58,7 @@ private:
 	typedef std::map<uint32, CSifModule*> ModuleMap;
 	typedef std::vector<uint8> PacketQueue;
 	typedef std::map<uint32, CALLREQUESTINFO> CallReplyMap;
-	typedef std::map<uint32, SIFRPCREQUESTEND> BindReplyMap;
+	typedef std::map<uint32, SIFRPCPENDINGREQUESTEND> BindReplyMap;
 
 	void DeleteModules();
 
@@ -70,10 +72,12 @@ private:
 	static void SaveState_Header(const std::string&, CStructFile&, const SIFCMDHEADER&);
 	static void SaveState_RpcCall(CStructFile&, const SIFRPCCALL&);
 	static void SaveState_RequestEnd(CStructFile&, const SIFRPCREQUESTEND&);
+	static void SaveState_PendingRequestEnd(CStructFile& file, const SIFRPCPENDINGREQUESTEND& pendingRequestEnd);
 
 	static void LoadState_Header(const std::string&, const CStructFile&, SIFCMDHEADER&);
 	static void LoadState_RpcCall(const CStructFile&, SIFRPCCALL&);
 	static void LoadState_RequestEnd(const CStructFile&, SIFRPCREQUESTEND&);
+	static void LoadState_PendingRequestEnd(const CStructFile& file, SIFRPCPENDINGREQUESTEND& pendingRequestEnd);
 
 	void Cmd_SetEERecvAddr(const SIFCMDHEADER*);
 	void Cmd_Initialize(const SIFCMDHEADER*);

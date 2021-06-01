@@ -80,6 +80,14 @@ struct SIFRPCREQUESTEND
 };
 static_assert(sizeof(SIFRPCREQUESTEND) == 0x30, "sizeof(SIFRPCREQUESTEND) must be 48 bytes.");
 
+// Wrapper for SIFRPCREQUESTEND, with
+// info in how many ticks it should be fired.
+struct SIFRPCPENDINGREQUESTEND
+{
+	SIFRPCREQUESTEND requestEnd;
+	uint32 pendingReplyDelay;
+};
+
 struct SIFRPCOTHERDATA
 {
 	SIFCMDHEADER header;

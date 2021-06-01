@@ -305,6 +305,7 @@ void CSubSystem::CountTicks(int ticks)
 	{
 		m_dmac.ResumeDMA1();
 	}
+	m_sif.CountTicks(ticks);
 	m_dmac.ResumeDMA2();
 	m_dmac.ResumeDMA8();
 	m_ipu.CountTicks(ticks);
