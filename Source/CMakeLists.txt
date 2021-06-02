@@ -282,6 +282,8 @@ set(COMMON_SRC_FILES
 	iop/ioman/OpticalMediaDevice.h
 	iop/ioman/OpticalMediaDirectoryIterator.cpp
 	iop/ioman/OpticalMediaDirectoryIterator.h
+	iop/ioman/TTYDevice.cpp
+	iop/ioman/TTYDevice.h
 	iop/ioman/PathDirectoryDevice.h
 	iop/ioman/PathDirectoryIterator.cpp
 	iop/ioman/PathDirectoryIterator.h
