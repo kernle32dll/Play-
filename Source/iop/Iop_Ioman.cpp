@@ -87,7 +87,17 @@ static PATHINFO SplitPath(const char* path)
 	}
 	PATHINFO result;
 	result.deviceName = std::string(fullPath.begin(), fullPath.begin() + position);
-	result.devicePath = std::string(fullPath.begin() + position + 1, fullPath.end());
+
+	auto semiPosition = fullPath.find(";");
+	if(semiPosition != std::string::npos && semiPosition > position)
+	{
+		result.devicePath = std::string(fullPath.begin() + position + 1, fullPath.begin() + semiPosition);
+	}
+	else
+	{
+		result.devicePath = std::string(fullPath.begin() + position + 1, fullPath.end());
+	}
+
 	//Some games (Street Fighter EX3) provide paths with trailing spaces
 	result.devicePath = RightTrim(result.devicePath);
 	return result;
