@@ -28,6 +28,7 @@
 #include "iop/ioman/HardDiskDevice.h"
 #include "iop/ioman/OpticalMediaDevice.h"
 #include "iop/ioman/PreferenceDirectoryDevice.h"
+#include "iop/ioman/TTYDevice.h"
 #include "Log.h"
 #include "DiskUtils.h"
 #include "GameConfig.h"
@@ -512,6 +513,7 @@ void CPS2VM::ResetVM()
 		iopOs->GetIoman()->RegisterDevice("cdrom0", Iop::Ioman::DevicePtr(new Iop::Ioman::COpticalMediaDevice(m_cdrom0)));
 		iopOs->GetIoman()->RegisterDevice("cdrom1", Iop::Ioman::DevicePtr(new Iop::Ioman::COpticalMediaDevice(m_cdrom0)));
 		iopOs->GetIoman()->RegisterDevice("hdd0", std::make_shared<Iop::Ioman::CHardDiskDevice>());
+		iopOs->GetIoman()->RegisterDevice("tty00", std::make_shared<Iop::Ioman::CTTYDevice>());
 
 		iopOs->GetLoadcore()->SetLoadExecutableHandler(std::bind(&CPS2OS::LoadExecutable, m_ee->m_os, std::placeholders::_1, std::placeholders::_2));
 	}
