@@ -1368,13 +1368,36 @@ CGSH_OpenGL::BitmapPtr CGSH_OpenGL::FindOrCreateBitmap(const FramebufferPtr& fra
 	return sharedPtr;
 }
 
-CGSH_OpenGL::FramebufferPtr CGSH_OpenGL::FindFramebufferAtPtr(uint32 ptr, uint32 psm) const
+CGSH_OpenGL::FramebufferPtr CGSH_OpenGL::FindSmallestFramebufferAtPtr(uint32 ptr, uint32 psm) const
 {
-	auto framebufferIterator = std::find_if(m_framebuffers.begin(), m_framebuffers.end(),
-	                                        [ptr, psm](const FramebufferPtr& framebuffer) {
-		                                        return framebuffer->m_psm == psm && framebuffer->m_basePtr == ptr;
-	                                        });
-	return (framebufferIterator != std::end(m_framebuffers)) ? *(framebufferIterator) : FramebufferPtr();
+	uint32 smallestSize = 0;
+	FramebufferPtr framebufferPtr = nullptr;
+
+	for(const auto& framebuffer : m_framebuffers)
+	{
+		if(framebuffer->m_psm != psm)
+		{
+			continue;
+		}
+
+		// If its a exact match, we can be sure its the right framebuffer
+		if(framebuffer->m_basePtr == ptr)
+		{
+			return framebuffer;
+		}
+
+		if(framebuffer->m_basePtr <= ptr && (framebuffer->m_basePtr + 0x100) >= ptr)
+		{
+			uint32 size = framebuffer->m_width * framebuffer->m_height;
+			if(size < smallestSize || smallestSize == 0)
+			{
+				smallestSize = size;
+				framebufferPtr = framebuffer;
+			}
+		}
+	}
+
+	return framebufferPtr;
 }
 
 /////////////////////////////////////////////////////////////
@@ -1972,7 +1995,7 @@ void CGSH_OpenGL::SyncCLUT(const TEX0& tex0)
 	{
 		const uint32 ptr = tex0.GetCLUTPtr();
 
-		FramebufferPtr framebuffer = FindFramebufferAtPtr(ptr, PSMCT32);
+		FramebufferPtr framebuffer = FindSmallestFramebufferAtPtr(ptr, PSMCT32);
 		if(framebuffer)
 		{
 			WriteFramebufferToMemory(framebuffer, true);

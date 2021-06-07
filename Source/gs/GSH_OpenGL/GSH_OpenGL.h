@@ -375,7 +375,7 @@ private:
 	FramebufferPtr FindFramebuffer(const FRAME&) const;
 	DepthbufferPtr FindDepthbuffer(const ZBUF&, const FRAME&) const;
 	BitmapPtr FindOrCreateBitmap(const FramebufferPtr&, uint32);
-	FramebufferPtr FindFramebufferAtPtr(uint32, uint32) const;
+	FramebufferPtr FindSmallestFramebufferAtPtr(uint32 ptr, uint32 psm) const;
 	void WriteFramebufferToMemory(const FramebufferPtr&, bool);
 
 	void DumpTexture(unsigned int, unsigned int, uint32);
