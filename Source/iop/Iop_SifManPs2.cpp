@@ -136,6 +136,10 @@ uint32 CSifManPs2::SifDmaStat(uint32 transferId)
 	CLog::GetInstance().Print(LOG_NAME, "SifDmaStat(transferId = %X);\r\n",
 	                          transferId);
 
+	if (transferId <= 0) {
+        return -1;
+	}
+
 	auto test = m_buffer[transferId - 1];
 
 	// Still working on the request
@@ -190,7 +194,7 @@ uint32 CSifManPs2::SifSetDma(uint32 structAddr, uint32 count)
 
 	executeQueuePosition(possiblePos);
 
-	return 1;
+	return possiblePos + 1;
 }
 
 uint32 CSifManPs2::SifSetDmaCallback(CMIPS& context, uint32 structAddr, uint32 count, uint32 callbackPtr, uint32 callbackParam)
