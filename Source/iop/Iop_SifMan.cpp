@@ -115,7 +115,7 @@ uint32 CSifMan::SifSetDma(uint32 structAddr, uint32 count)
 {
 	CLog::GetInstance().Print(LOG_NAME, FUNCTION_SIFSETDMA "(structAddr = 0x%08X, count = %d);\r\n",
 	                          structAddr, count);
-	return count;
+	return 1;
 }
 
 uint32 CSifMan::SifDmaStat(uint32 transferId)

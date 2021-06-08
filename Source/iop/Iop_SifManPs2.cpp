@@ -89,7 +89,7 @@ uint32 CSifManPs2::SifSetDma(uint32 structAddr, uint32 count)
 		}
 	}
 
-	return count;
+	return 1;
 }
 
 uint8* CSifManPs2::GetEeRam() const
