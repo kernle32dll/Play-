@@ -149,7 +149,7 @@ uint32 CSpeed::ReadRegister(uint32 address)
 		result = 17;
 		break;
 	case REG_REV3:
-		result = SPEED_CAPS_SMAP | SPEED_CAPS_ATA;
+		result = SPEED_CAPS_SMAP;
 		break;
 	case REG_REV8:
 		// ps2atad checks for this
