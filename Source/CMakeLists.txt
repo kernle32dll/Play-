@@ -293,6 +293,8 @@ set(COMMON_SRC_FILES
 	iop/Iop_FileIoHandler2200.h
 	iop/Iop_Heaplib.cpp
 	iop/Iop_Heaplib.h
+	iop/Iop_iLink.cpp
+	iop/Iop_iLink.h
 	iop/Iop_Intc.cpp
 	iop/Iop_Intc.h
 	iop/Iop_Intrman.cpp

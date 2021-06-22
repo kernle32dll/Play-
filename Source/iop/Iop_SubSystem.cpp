@@ -23,6 +23,7 @@ CSubSystem::CSubSystem(bool ps2Mode)
     , m_scratchPad(new uint8[IOP_SCRATCH_SIZE])
     , m_spuRam(new uint8[SPU_RAM_SIZE])
     , m_dmac(m_ram, m_intc)
+    , m_ilink(m_intc)
     , m_counters(ps2Mode ? IOP_CLOCK_OVER_FREQ : IOP_CLOCK_BASE_FREQ, m_intc)
     , m_spuCore0(m_spuRam, SPU_RAM_SIZE, 0)
     , m_spuCore1(m_spuRam, SPU_RAM_SIZE, 1)
@@ -228,14 +229,13 @@ uint32 CSubSystem::ReadIoRegister(uint32 address)
 	{
 		return m_speed.ReadRegister(address);
 	}
-	else if(address >= 0x1F808400 && address <= 0x1F808500)
+	else if(address >= 0x1F808400 && address <= 0x1F808554)
 	{
-		//iLink (aka Firewire) stuff
-		return 0x08;
+		return m_ilink.ReadRegister(address);
 	}
 	else
 	{
-		CLog::GetInstance().Print(LOG_NAME, "Reading an unknown hardware register (0x%08X).\r\n", address);
+		CLog::GetInstance().Warn(LOG_NAME, "Reading an unknown hardware register (0x%08X).\r\n", address);
 	}
 	return 0;
 }
@@ -284,6 +284,10 @@ uint32 CSubSystem::WriteIoRegister(uint32 address, uint32 value)
 	else if(address >= SPEED_REG_BEGIN && address <= SPEED_REG_END)
 	{
 		m_speed.WriteRegister(address, value);
+	}
+	else if(address >= 0x1F808400 && address <= 0x1F808554)
+	{
+		m_ilink.WriteRegister(address, value);
 	}
 	else
 	{
