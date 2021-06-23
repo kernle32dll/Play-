@@ -83,6 +83,13 @@ void CiLink::WriteRegister(uint32 address, uint32 value)
 		{
 			uint8 portValue = (value >> 16) & 0xFF;
 			m_phyreg[port] = portValue;
+
+			// Bus reset
+			if(port == 0x5 && ((portValue & 0x40) > 0))
+			{
+				m_intr0 |= 0x20000000;
+				m_intc.AssertLine(CIntc::LINE_ILINK);
+			}
 		}
 		else if(value & PHY_READ)
 		{
@@ -90,7 +97,7 @@ void CiLink::WriteRegister(uint32 address, uint32 value)
 		}
 
 		// TODO: Dunno what this does, but OPL expects INTR0 to have this bit after a PHY access
-		m_intr0 |= 0x40000000;
+//		m_intr0 |= 0x40000000;
 
 		break;
 	}
