@@ -239,6 +239,11 @@ void CDMAC::ResumeDMA8()
 	m_D8.Execute();
 }
 
+bool CDMAC::IsDMA2Started() const
+{
+	return (m_D2.m_CHCR.nSTR != 0) && (m_D_ENABLE == 0);
+}
+
 bool CDMAC::IsDMA4Started() const
 {
 	return (m_D4.m_CHCR.nSTR != 0) && ((m_D_ENABLE & CDMAC::ENABLE_CPND) == 0);

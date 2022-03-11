@@ -486,7 +486,7 @@ uint32 CGIF::GetRegister(uint32 address)
 	switch(address)
 	{
 	case GIF_STAT:
-		if(m_path3Masked)
+		if(m_path3Masked && m_dmac.IsDMA2Started())
 		{
 			result |= GIF_STAT_M3P;
 			//Indicate that FIFO is full (15 qwords) (needed for GTA: San Andreas)
