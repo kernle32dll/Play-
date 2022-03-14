@@ -173,6 +173,22 @@ uint32 CVif::GetRegister(uint32 address)
 	case VIF1_R3:
 		result = m_R[3];
 		break;
+	case VIF0_C0:
+	case VIF1_C0:
+		result = m_C[0];
+		break;
+	case VIF0_C1:
+	case VIF1_C1:
+		result = m_C[1];
+		break;
+	case VIF0_C2:
+	case VIF1_C2:
+		result = m_C[2];
+		break;
+	case VIF0_C3:
+	case VIF1_C3:
+		result = m_C[3];
+		break;
 	default:
 		CLog::GetInstance().Warn(LOG_NAME, "Reading unknown register 0x%08X.\r\n", address);
 		break;
@@ -854,6 +870,10 @@ void CVif::DisassembleGet(uint32 address)
 		LOG_GET(VIF0_R1)
 		LOG_GET(VIF0_R2)
 		LOG_GET(VIF0_R3)
+		LOG_GET(VIF0_C0)
+		LOG_GET(VIF0_C1)
+		LOG_GET(VIF0_C2)
+		LOG_GET(VIF0_C3)
 
 		LOG_GET(VIF1_STAT)
 		LOG_GET(VIF1_ERR)
@@ -867,6 +887,10 @@ void CVif::DisassembleGet(uint32 address)
 		LOG_GET(VIF1_R1)
 		LOG_GET(VIF1_R2)
 		LOG_GET(VIF1_R3)
+		LOG_GET(VIF1_C0)
+		LOG_GET(VIF1_C1)
+		LOG_GET(VIF1_C2)
+		LOG_GET(VIF1_C3)
 
 	default:
 		CLog::GetInstance().Print(LOG_NAME, "Reading unknown register 0x%08X.\r\n", address);
