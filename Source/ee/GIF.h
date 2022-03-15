@@ -107,5 +107,8 @@ private:
 	CGSHandler*& m_gs;
 	CDMAC& m_dmac;
 
+	uint32 m_fifoBuffer[24];
+	uint16 m_fifoIndex;
+
 	CProfiler::ZoneHandle m_gifProfilerZone = 0;
 };

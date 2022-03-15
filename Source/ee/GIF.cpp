@@ -50,6 +50,8 @@ void CGIF::Reset()
 	m_signalState = SIGNAL_STATE_NONE;
 	m_maskedPath3XferState = MASKED_PATH3_XFER_NONE;
 	m_path3XferActiveTicks = 0;
+
+	m_fifoIndex = 0;
 }
 
 void CGIF::LoadState(Framework::CZipArchiveReader& archive)
@@ -495,6 +497,52 @@ void CGIF::SetRegister(uint32 address, uint32 value)
 {
 	switch(address)
 	{
+	case 0x10006000:
+	case 0x10006004:
+	case 0x10006008:
+	case 0x1000600C:
+	{
+		m_fifoBuffer[m_fifoIndex] = value;
+		CLog::GetInstance().Warn(LOG_NAME, "0x%08X -> 0x%08X.\r\n", address, value);
+		m_fifoIndex++;
+
+		if(m_fifoIndex >= 4)
+		{
+			auto tag = *reinterpret_cast<const TAG*>(&m_fifoBuffer);
+
+			if(m_fifoIndex == (4 + (tag.loops + 1) * 4))
+			{
+				CLog::GetInstance().Warn(LOG_NAME, "loops 0x%08X.\r\n", tag.loops);
+				CLog::GetInstance().Warn(LOG_NAME, "eop 0x%08X.\r\n", tag.eop);
+				CLog::GetInstance().Warn(LOG_NAME, "pre 0x%08X.\r\n", tag.pre);
+				CLog::GetInstance().Warn(LOG_NAME, "prim 0x%08X.\r\n", tag.prim);
+				CLog::GetInstance().Warn(LOG_NAME, "cmd 0x%08X.\r\n", tag.cmd);
+				CLog::GetInstance().Warn(LOG_NAME, "nreg 0x%08X.\r\n", tag.nreg);
+				CLog::GetInstance().Warn(LOG_NAME, "regs 0x%08X%08X.\r\n", tag.regs, tag.regs >> 16);
+
+				// STRICTLY debugging!
+				auto regs = tag.nreg;
+				auto regList = tag.regs;
+				if(regs == 0) regs = 0x10;
+				auto regsTemp = regs;
+
+				while(regsTemp != 0)
+				{
+					uint64 temp = 0;
+					uint32 regDesc = (uint32)((regList >> ((regs - regsTemp) * 4)) & 0x0F);
+
+					CLog::GetInstance().Warn(LOG_NAME, "regDesc 0x%08X.\r\n", regDesc);
+
+					regsTemp--;
+				}
+
+				ProcessSinglePacket(reinterpret_cast<const uint8*>(m_fifoBuffer), 0x10 * 24, 0, 0x10 * m_fifoIndex, CGsPacketMetadata(3));
+				m_fifoIndex = 0;
+			}
+		}
+
+		break;
+	}
 	case GIF_CTRL:
 		if(value & 0x1)
 		{

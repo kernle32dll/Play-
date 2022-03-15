@@ -496,7 +496,7 @@ uint32 CSubSystem::IOPortWriteHandler(uint32 nAddress, uint32 nData)
 		m_ipu.SetRegister(nAddress, nData);
 		ExecuteIpu();
 	}
-	else if(nAddress >= CGIF::REGS_START && nAddress < CGIF::REGS_END)
+	else if((nAddress >= CGIF::REGS_START && nAddress < CGIF::REGS_END) || (nAddress >= 0x10006000 && nAddress <= 0x1000600C))
 	{
 		m_gif.SetRegister(nAddress, nData);
 	}
