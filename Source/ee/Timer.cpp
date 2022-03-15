@@ -107,35 +107,44 @@ uint32 CTimer::GetRegister(uint32 nAddress)
 	switch(nAddress & 0x7FF)
 	{
 	case 0x00:
-		return m_timer[nTimerId].nCOUNT & 0xFFFF;
-		break;
+	case 0x01:
+	case 0x02:
+	case 0x03:
 	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
 	case 0x08:
 	case 0x0C:
+	case 0x0E:
+	case 0x0F:
+		return m_timer[nTimerId].nCOUNT & 0xFFFF;
 		break;
 
 	case 0x10:
-		return m_timer[nTimerId].nMODE;
-		break;
 	case 0x14:
 	case 0x18:
 	case 0x1C:
+	case 0x1F:
+		return m_timer[nTimerId].nMODE;
 		break;
 
 	case 0x20:
-		return m_timer[nTimerId].nCOMP;
-		break;
 	case 0x24:
 	case 0x28:
 	case 0x2C:
+	case 0x2E:
+	case 0x2F:
+		return m_timer[nTimerId].nCOMP;
 		break;
 
 	case 0x30:
-		return m_timer[nTimerId].nHOLD;
-		break;
 	case 0x34:
 	case 0x38:
 	case 0x3C:
+	case 0x3E:
+	case 0x3F:
+		return m_timer[nTimerId].nHOLD;
 		break;
 
 	default:
