@@ -13,6 +13,7 @@ class CGIF
 public:
 	enum REGISTER
 	{
+		GIF_CTRL = 0x10003000,
 		GIF_MODE = 0x10003010,
 		GIF_STAT = 0x10003020
 	};
