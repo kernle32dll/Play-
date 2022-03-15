@@ -528,7 +528,12 @@ void CGIF::SetRegister(uint32 address, uint32 value)
 	{
 		switch(address)
 		{
-		case GIF_MODE:
+		case GIF_CTRL:
+		if(value & 0x1)
+		{
+			this->Reset();
+		}
+	case GIF_MODE:
 			m_MODE = value;
 			break;
 		}
