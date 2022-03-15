@@ -543,6 +543,12 @@ uint32 CDMAC::GetRegister(uint32 nAddress)
 
 void CDMAC::SetRegister(uint32 nAddress, uint32 nData)
 {
+	if((nAddress & 0xFF) == 0x80 && nAddress != D8_SADR && nAddress != D9_SADR)
+	{
+		// Some games try to write SADR (usually just 0), but it's only implemented for D8 and D9.
+		return;
+	}
+
 	switch(nAddress)
 	{
 	//Channel 0
