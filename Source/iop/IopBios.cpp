@@ -199,8 +199,7 @@ void CIopBios::Reset(const Iop::SifManPtr& sifMan)
 		RegisterModule(m_loadcore);
 	}
 	{
-		m_libsd = std::make_shared<Iop::CLibSd>(*m_sifMan);
-        RegisterModule(m_libsd);
+		m_libsd = std::make_shared<Iop::CLibSd>();
 	}
 	{
 		RegisterModule(std::make_shared<Iop::CThbase>(*this, m_ram));
@@ -285,7 +284,6 @@ void CIopBios::Reset(const Iop::SifManPtr& sifMan)
 	m_hleModules.insert(std::make_pair("rom0:XMCSERV", m_mcserv));
 	m_hleModules.insert(std::make_pair("rom0:CDVDMAN", m_cdvdman));
 	m_hleModules.insert(std::make_pair("rom0:CDVDFSV", m_cdvdfsv));
-	m_hleModules.insert(std::make_pair("rom0:LIBSD", m_libsd));
 
 #endif
 
