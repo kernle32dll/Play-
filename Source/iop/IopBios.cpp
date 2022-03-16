@@ -266,7 +266,7 @@ void CIopBios::Reset(const Iop::SifManPtr& sifMan)
 		RegisterModule(m_powerOff);
 	}
 	RegisterModule(std::make_shared<Iop::CIomanX>(*m_ioman));
-	//RegisterModule(std::make_shared<Iop::CNaplink>(*m_sifMan, *m_ioman));
+	RegisterModule(std::make_shared<Iop::CNaplink>(*m_sifMan, *m_ioman));
 	{
 		m_padman = std::make_shared<Iop::CPadMan>();
 		m_mtapman = std::make_shared<Iop::CMtapMan>();

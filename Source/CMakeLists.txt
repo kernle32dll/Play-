@@ -345,6 +345,8 @@ set(COMMON_SRC_FILES
 	iop/namco_arcade/Iop_NamcoAcRam.h
 	iop/Iop_NamcoArcade.cpp
 	iop/Iop_NamcoArcade.h
+	iop/Iop_Naplink.cpp
+	iop/Iop_Naplink.h
 	iop/Iop_PadMan.cpp
 	iop/Iop_PadMan.h
 	iop/Iop_PathUtils.cpp
