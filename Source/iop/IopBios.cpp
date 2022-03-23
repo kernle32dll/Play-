@@ -2217,8 +2217,8 @@ uint32 CIopBios::DeleteEventFlag(uint32 eventId)
 	auto eventFlag = m_eventFlags[eventId];
 	if(!eventFlag)
 	{
-		CLog::GetInstance().Print(LOGNAME, "%d: Warning, trying to access invalid event flag with id %d.\r\n",
-		                          m_currentThreadId.Get(), eventId);
+		CLog::GetInstance().Warn(LOGNAME, "%d: Warning, trying to delete invalid event flag with id %d.\r\n",
+		                         m_currentThreadId.Get(), eventId);
 		return KERNEL_RESULT_ERROR_UNKNOWN_EVFID;
 	}
 
@@ -2237,6 +2237,8 @@ uint32 CIopBios::SetEventFlag(uint32 eventId, uint32 value, bool inInterrupt)
 	auto eventFlag = m_eventFlags[eventId];
 	if(eventFlag == nullptr)
 	{
+		CLog::GetInstance().Warn(LOGNAME, "%d: Warning, trying to set invalid event flag with id %d and value 0x%08X.\r\n",
+		                         m_currentThreadId.Get(), eventId, value);
 		return -1;
 	}
 
@@ -2280,6 +2282,8 @@ uint32 CIopBios::ClearEventFlag(uint32 eventId, uint32 value)
 	EVENTFLAG* eventFlag = m_eventFlags[eventId];
 	if(eventFlag == NULL)
 	{
+		CLog::GetInstance().Warn(LOGNAME, "%d: Warning, trying to clear invalid event flag with id %d and value 0x%08X.\r\n",
+		                         m_currentThreadId.Get(), eventId, value);
 		return -1;
 	}
 
@@ -2298,6 +2302,8 @@ uint32 CIopBios::WaitEventFlag(uint32 eventId, uint32 value, uint32 mode, uint32
 	auto eventFlag = m_eventFlags[eventId];
 	if(eventFlag == nullptr)
 	{
+		CLog::GetInstance().Warn(LOGNAME, "%d: Warning, trying to wait for invalid event flag with id %d and value 0x%08X.\r\n",
+		                         m_currentThreadId.Get(), eventId, value);
 		return -1;
 	}
 
@@ -2328,6 +2334,8 @@ uint32 CIopBios::PollEventFlag(uint32 eventId, uint32 value, uint32 mode, uint32
 	auto eventFlag = m_eventFlags[eventId];
 	if(!eventFlag)
 	{
+		CLog::GetInstance().Warn(LOGNAME, "%d: Warning, trying to poll invalid event flag with id %d and value 0x%08X.\r\n",
+		                         m_currentThreadId.Get(), eventId, value);
 		return KERNEL_RESULT_ERROR_UNKNOWN_EVFID;
 	}
 
@@ -2356,6 +2364,8 @@ uint32 CIopBios::ReferEventFlagStatus(uint32 eventId, uint32 infoPtr)
 	EVENTFLAG* eventFlag = m_eventFlags[eventId];
 	if(eventFlag == NULL)
 	{
+		CLog::GetInstance().Warn(LOGNAME, "%d: Warning, trying to refer invalid event flag with id %d.\r\n",
+		                         m_currentThreadId.Get(), eventId);
 		return -1;
 	}
 
