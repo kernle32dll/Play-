@@ -721,6 +721,9 @@ void CSIF::SetRegister(uint32 nRegister, uint32 nValue)
 	case 0x00000001:
 		m_nMAINADDR = nValue;
 		break;
+	case 0x00000004:
+		m_nSMFLAG |= nValue;
+		break;
 	case 0x80000000:
 		//Set by CMD library
 		break;

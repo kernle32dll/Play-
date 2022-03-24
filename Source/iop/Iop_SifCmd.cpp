@@ -23,6 +23,7 @@ using namespace Iop;
 #define MODULE_NAME "sifcmd"
 #define MODULE_VERSION 0x101
 
+#define FUNCTION_SIFINITCMD "SifInitCmd"
 #define FUNCTION_SIFGETSREG "SifGetSreg"
 #define FUNCTION_SIFSETSREG "SifSetSreg"
 #define FUNCTION_SIFSETCMDBUFFER "SifSetCmdBuffer"
@@ -120,6 +121,9 @@ std::string CSifCmd::GetFunctionName(unsigned int functionId) const
 {
 	switch(functionId)
 	{
+	case 4:
+		return FUNCTION_SIFINITCMD;
+		break;
 	case 6:
 		return FUNCTION_SIFGETSREG;
 		break;
@@ -205,6 +209,9 @@ void CSifCmd::Invoke(CMIPS& context, unsigned int functionId)
 {
 	switch(functionId)
 	{
+	case 4:
+		SifInitCmd();
+		break;
 	case 6:
 		context.m_State.nGPR[CMIPS::V0].nV0 = SifGetSreg(
 		    context.m_State.nGPR[CMIPS::A0].nV0);
@@ -724,6 +731,36 @@ void CSifCmd::ProcessNextDynamicCommand()
 		assert(false);
 		FinishExecCmd();
 	}
+}
+
+void CSifCmd::SifInitCmd()
+{
+	CLog::GetInstance().Print(LOG_NAME, FUNCTION_SIFINITCMD "();\r\n");
+
+	auto moduleData = reinterpret_cast<MODULEDATA*>(m_ram + m_moduleDataAddr);
+
+	// Reset all sregs
+	for(unsigned int& sreg : moduleData->sreg)
+	{
+		sreg = 0;
+	}
+
+	// Reset system cmds
+	for(int i = 0; i < MAX_SYSTEM_COMMAND; ++i)
+	{
+		auto& cmdDataEntry = reinterpret_cast<SIFCMDDATA*>(m_ram + m_sysCmdBufferAddr)[i];
+		cmdDataEntry.sifCmdHandler = 0;
+		cmdDataEntry.data = 0;
+	}
+
+	// Reset usr cmds
+	for(int i = 0; i < moduleData->usrCmdBufferLen; ++i)
+	{
+		auto& cmdDataEntry = reinterpret_cast<SIFCMDDATA*>(m_ram + moduleData->usrCmdBufferAddr)[i];
+		cmdDataEntry.sifCmdHandler = 0;
+		cmdDataEntry.data = 0;
+	}
+	moduleData->usrCmdBufferLen = 0;
 }
 
 int32 CSifCmd::SifGetSreg(uint32 regIndex)
