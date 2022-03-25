@@ -27,6 +27,7 @@
 #define FUNCTION_CDREADCLOCK "CdReadClock"
 #define FUNCTION_CDSTATUS "CdStatus"
 #define FUNCTION_CDCALLBACK "CdCallback"
+#define FUNCTION_CDBREAK "CdBreak"
 #define FUNCTION_CDGETREADPOS "CdGetReadPos"
 #define FUNCTION_CDSTINIT "CdStInit"
 #define FUNCTION_CDSTREAD "CdStRead"
@@ -229,6 +230,9 @@ std::string CCdvdman::GetFunctionName(unsigned int functionId) const
 	case 37:
 		return FUNCTION_CDCALLBACK;
 		break;
+	case 39:
+		return FUNCTION_CDBREAK;
+		break;
 	case 44:
 		return FUNCTION_CDGETREADPOS;
 		break;
@@ -327,6 +331,9 @@ void CCdvdman::Invoke(CMIPS& ctx, unsigned int functionId)
 		break;
 	case 37:
 		ctx.m_State.nGPR[CMIPS::V0].nV0 = CdCallback(ctx.m_State.nGPR[CMIPS::A0].nV0);
+		break;
+	case 39:
+		ctx.m_State.nGPR[CMIPS::V0].nV0 = CdBreak();
 		break;
 	case 44:
 		ctx.m_State.nGPR[CMIPS::V0].nV0 = CdGetReadPos();
@@ -588,6 +595,16 @@ uint32 CCdvdman::CdCallback(uint32 callbackPtr)
 	uint32 oldCallbackPtr = m_callbackPtr;
 	m_callbackPtr = callbackPtr;
 	return oldCallbackPtr;
+}
+
+uint32 CCdvdman::CdBreak()
+{
+	CLog::GetInstance().Print(LOG_NAME, FUNCTION_CDBREAK "();\r\n");
+
+	m_pendingCommand = COMMAND_NONE;
+	m_status = CDVD_STATUS_STOPPED;
+
+	return 1;
 }
 
 uint32 CCdvdman::CdGetReadPos()
