@@ -1,6 +1,7 @@
 #include "GsStateUtils.h"
 #include "string_format.h"
 #include "gs/GsDebuggerInterface.h"
+#include <cstring>
 
 // clang-format off
 static const char* g_yesNoString[2] =
