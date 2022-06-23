@@ -128,7 +128,7 @@ uint32 CGIF::ProcessPacked(const uint8* memory, uint32 address, uint32 end)
 				//XYZF2
 				temp = (packet.nV[0] & 0xFFFF);
 				temp |= (packet.nV[1] & 0xFFFF) << 16;
-				temp |= (uint64)(packet.nV[2] & 0x0FFFFFF0) << 28;
+				temp |= (uint64)(packet.nV[2] & 0xFFFFFF00) << 24;
 				temp |= (uint64)(packet.nV[3] & 0x00000FF0) << 52;
 				if(packet.nV[3] & 0x8000)
 				{
