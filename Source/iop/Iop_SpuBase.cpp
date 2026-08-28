@@ -227,8 +227,9 @@ void CSpuBase::Reset()
 	}
 
 	m_blockReader.Reset();
-	m_soundInputDataAddr = (m_spuNumber == 0) ? SOUND_INPUT_DATA_CORE0_BASE : SOUND_INPUT_DATA_CORE1_BASE;
+	m_soundInputDataAddr = m_spuNumber == 0 ? SOUND_INPUT_DATA_CORE0_BASE_BYTES : SOUND_INPUT_DATA_CORE1_BASE_BYTES;
 	m_blockWritePtr = 0;
+	memset(m_soundInputDataArmed, 0, sizeof(m_soundInputDataArmed));
 }
 
 void CSpuBase::LoadState(Framework::CZipArchiveReader& archive)
@@ -606,6 +607,27 @@ uint32 CSpuBase::ReceiveDma(uint8* buffer, uint32 blockSize, uint32 blockAmount,
 		assert((m_ctrl & CONTROL_DMA) == CONTROL_DMA_WRITE);
 		unsigned int blocksTransfered = 0;
 		m_sampleCache->ClearRange(m_transferAddr, blockSize * blockAmount);
+
+		uint32 transferStart = m_transferAddr;
+		uint32 transferEnd = (m_transferAddr + blockSize * blockAmount) & (m_ramSize - 1);
+
+		uint32 soundInputStart = m_soundInputDataAddr;
+		uint32 soundInputEnd = m_soundInputDataAddr + SOUND_INPUT_DATA_SIZE_BYTES;
+
+		if (transferStart >= soundInputStart && transferEnd <= soundInputEnd)
+		{
+			for (int i = 0; i < SOUND_INPUT_DATA_BUFFERS * SOUND_INPUT_DATA_CHANNELS; i++)
+			{
+				if (transferStart >= soundInputStart + i * 0x200 &&
+				    transferEnd <= soundInputStart + (i + 1) * 0x200)
+				{
+					CLog::GetInstance().Warn(LOG_NAME, "MEMIN armed for buffer %d.\r\n", i);
+					m_soundInputDataArmed[i] = true;
+					break;
+				}
+			}
+		}
+
 		for(unsigned int i = 0; i < blockAmount; i++)
 		{
 			uint32 copySize = std::min<uint32>(m_ramSize - m_transferAddr, blockSize);
@@ -714,6 +736,11 @@ void CSpuBase::MixSamples(int32 inputSample, int32 volumeLevel, int16* output)
 	*output = static_cast<int16>(resultSample);
 }
 
+bool CSpuBase::AddressInMemIn(uint32 base, uint32 address)
+{
+	return address >= base && address < (base + 0x200);
+}
+
 void CSpuBase::Render(int16* samples, unsigned int sampleCount)
 {
 	bool updateReverb = m_reverbEnabled && (m_ctrl & CONTROL_REVERB) && (m_reverbWorkAddrStart < m_reverbWorkAddrEnd);
@@ -784,11 +811,57 @@ void CSpuBase::Render(int16* samples, unsigned int sampleCount)
 			}
 		}
 
-		if(!m_blockReader.CanReadSamples() && (m_blockWritePtr == SOUND_INPUT_DATA_SIZE))
+		if(!m_blockReader.CanReadSamples())
 		{
-			//We're ready to consume some data
-			m_blockReader.FillBlock(m_ram + m_soundInputDataAddr);
-			m_blockWritePtr = 0;
+			if (m_blockWritePtr == SOUND_INPUT_DATA_SIZE)
+			{
+				//We're ready to consume some data
+				m_blockReader.FillBlock(m_ram + m_soundInputDataAddr);
+				m_blockWritePtr = 0;
+			}
+			else if (m_soundInputDataArmed[0] && m_soundInputDataArmed[2])
+			{
+				CLog::GetInstance().Warn(LOG_NAME, "IRQ is currently 0x%08X, sound input data is armed for buffers 0 and 2.\r\n", m_irqAddr);
+				// Yes - the SPU touches the sound area of both cores at once, so we need to check for both cores' sound input data areas
+				// Flatout 2 does this, where it DMAs data into core 0 MEMIN, and sets an IRQ in core 1 MEMIN
+				if(irqEnabled && (AddressInMemIn(SOUND_INPUT_DATA_CORE0_BASE_BYTES + 0x200 * 0, m_irqAddr) ||
+				AddressInMemIn(SOUND_INPUT_DATA_CORE0_BASE_BYTES + 0x200 * 2, m_irqAddr) ||
+				AddressInMemIn(SOUND_INPUT_DATA_CORE1_BASE_BYTES + 0x200 * 0, m_irqAddr) ||
+				AddressInMemIn(SOUND_INPUT_DATA_CORE1_BASE_BYTES + 0x200 * 2, m_irqAddr)))
+				{
+					CLog::GetInstance().Warn(LOG_NAME, "IRQ in MEMIN buffer 0 or 2 detected!.\r\n");
+					m_irqPending = true;
+				}
+				CLog::GetInstance().Warn(LOG_NAME, "Reader filled from MEMIN buffer 0.\r\n");
+
+				uint8 tempBuffer[SOUND_INPUT_DATA_SIZE] = {};
+				memcpy(tempBuffer, m_ram + m_soundInputDataAddr + 0x200 * 0, 0x200);
+				memcpy(tempBuffer + 0x200, m_ram + m_soundInputDataAddr + 0x200 * 2, 0x200);
+				m_blockReader.FillBlock(tempBuffer);
+
+				m_soundInputDataArmed[0] = false;
+				m_soundInputDataArmed[2] = false;
+			} else if (m_soundInputDataArmed[1] && m_soundInputDataArmed[3])
+			{
+				CLog::GetInstance().Warn(LOG_NAME, "IRQ is currently 0x%08X, sound input data is armed for buffers 1 and 3.\r\n", m_irqAddr);
+				if(irqEnabled && (AddressInMemIn(SOUND_INPUT_DATA_CORE0_BASE_BYTES + 0x200 * 1, m_irqAddr) ||
+				AddressInMemIn(SOUND_INPUT_DATA_CORE0_BASE_BYTES + 0x200 * 3, m_irqAddr) ||
+				AddressInMemIn(SOUND_INPUT_DATA_CORE1_BASE_BYTES + 0x200 * 1, m_irqAddr) ||
+				AddressInMemIn(SOUND_INPUT_DATA_CORE1_BASE_BYTES + 0x200 * 3, m_irqAddr)))
+				{
+					CLog::GetInstance().Warn(LOG_NAME, "IRQ in MEMIN buffer 1 or 3 detected!.\r\n");
+					m_irqPending = true;
+				}
+				CLog::GetInstance().Warn(LOG_NAME, "Reader filled from MEMIN buffer 1.\r\n");
+
+				uint8 tempBuffer[SOUND_INPUT_DATA_SIZE] = {};
+				memcpy(tempBuffer, m_ram + m_soundInputDataAddr + 0x200 * 1, 0x200);
+				memcpy(tempBuffer + 0x200, m_ram + m_soundInputDataAddr + 0x200 * 3, 0x200);
+				m_blockReader.FillBlock(tempBuffer);
+
+				m_soundInputDataArmed[1] = false;
+				m_soundInputDataArmed[3] = false;
+			}
 		}
 
 		if(m_blockReader.CanReadSamples())

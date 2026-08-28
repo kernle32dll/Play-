@@ -282,6 +282,7 @@ namespace Iop
 		int32 m_extInputVolR = 0x7FFF;
 
 		static void MixSamples(int32, int32, int16*);
+		bool AddressInMemIn(uint32 base, uint32 address);
 
 	private:
 		enum
@@ -292,9 +293,14 @@ namespace Iop
 			CORE1_SIN_RIGHT = 0xA00,
 			CORE0_OUTPUT_SIZE = 0x200,
 			SOUND_INPUT_DATA_CORE0_BASE = 0x2000,
+			SOUND_INPUT_DATA_CORE0_BASE_BYTES = SOUND_INPUT_DATA_CORE0_BASE << 1,
 			SOUND_INPUT_DATA_CORE1_BASE = 0x2400,
+			SOUND_INPUT_DATA_CORE1_BASE_BYTES = SOUND_INPUT_DATA_CORE1_BASE << 1,
 			SOUND_INPUT_DATA_SIZE = 0x400,
-			SOUND_INPUT_DATA_SAMPLES = (SOUND_INPUT_DATA_SIZE / 4),
+			SOUND_INPUT_DATA_SIZE_BYTES = SOUND_INPUT_DATA_SIZE << 1,
+			SOUND_INPUT_DATA_BUFFERS = 2,
+			SOUND_INPUT_DATA_CHANNELS = 2,
+			SOUND_INPUT_DATA_SAMPLES = (SOUND_INPUT_DATA_SIZE / SOUND_INPUT_DATA_BUFFERS / SOUND_INPUT_DATA_CHANNELS),
 		};
 
 		class CSampleReader
@@ -431,6 +437,7 @@ namespace Iop
 		CBlockSampleReader m_blockReader;
 		uint32 m_soundInputDataAddr = 0;
 		uint32 m_blockWritePtr = 0;
+		bool m_soundInputDataArmed[SOUND_INPUT_DATA_BUFFERS * SOUND_INPUT_DATA_CHANNELS];
 
 		static_assert((sizeof(decltype(m_reverb)) % 16) == 0, "sizeof(m_reverb) must be a multiple of 16 (needed for saved state).");
 	};
